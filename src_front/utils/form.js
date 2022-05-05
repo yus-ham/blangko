@@ -19,7 +19,7 @@ function Processor(id, o = {}) {
     }
   }
 
-  const w = f => [wretch, wretchAuth][Number(o.auth)](f.action);
+  const w = f => [wretch, wretchAuth][Number(o.checkAuth)](f.action);
   const wb = f => ('multipart/form-data' === f.enctype) ? w(f).body(new FormData(f)) : w(f).formUrl(form2Qs(f));
 
   w.get = f => w(f).query(form2Qs(f));
