@@ -7,7 +7,7 @@
 
   const formId = 'form-login';
   const { initialize, submitting } = createForm(formId, {
-    auth: false,
+    checkAuth: false,
     errorClass: ['text-danger'],
     errorsMap: {password: ['.hint']},
 
