@@ -10,9 +10,9 @@ const __dir = _ => {
 
 Object.entries(config.globals||{}).forEach(([key, value]) => globalThis[key] = value)
 
-if (process.env.PORT) {
-    config.server.port = process.env.PORT;
-}
+process.env.PORT && (config.server.port = process.env.PORT);
+process.env.BASE_URL && (globalsThis.BASE_URL = process.env.BASE_URL);
+process.env.API_URL && (globalThis.API_URL = process.env.API_URL);
 
 
 export default defineConfig({

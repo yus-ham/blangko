@@ -64,11 +64,13 @@ export const routifyConfig = {
   }
 }
 
-export const getSession = _ => $(session) || JSON.fetch(wretch(api('auth/session'), {credentials: 'include', mode: 'cors'})).then(x => x.data ? session.set(x.data) || x.data : x);
+export const getSession = _ => $(session) || JSON.fetch(wretch('/api/auth/session', {credentials: 'include', mode: 'cors'})).then(x => x.data ? session.set(x.data) || x.data : x);
 
 export const authenticate = res => {
   if (res.status === 401)
     return openAuthForm()
+
+  session.set(res.data)
 }
 
 export const openAuthForm = _ => {

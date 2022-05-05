@@ -7,7 +7,7 @@
 
   const formId = 'form-login';
   const { initialize, submitting } = createForm(formId, {
-    auth: false,
+    checkAuth: false,
     errorClass: ['text-danger'],
     errorsMap: {password: ['.hint']},
 
@@ -27,7 +27,7 @@
         <h1>Sign in</h1>
         <h2>A minimalist layout for Login pages</h2>
       </hgroup>
-      <form id={formId} method="post" action={api('auth/session')}>
+      <form id={formId} method="post" action="/api/auth/session">
         <input name="username" placeholder="Enter username" aria-label="Enter username" autocomplete="nickname" required />
         <input type="password" name="password" placeholder="Password" aria-label="Password" autocomplete="current-password" required />
         <fieldset>

@@ -19,7 +19,7 @@ function Processor(id, o = {}) {
     }
   }
 
-  const w = f => [wretch, wretchAuth][Number(o.auth)](f.action);
+  const w = f => [wretch, wretchAuth][Number(o.checkAuth)](f.action);
   const wb = f => ('multipart/form-data' === f.enctype) ? w(f).body(new FormData(f)) : w(f).formUrl(form2Qs(f));
 
   w.get = f => w(f).query(form2Qs(f));
@@ -54,12 +54,11 @@ function Processor(id, o = {}) {
 
   const parseErrors = (form, err) => {
     const errors = JSON.parse(err.text)
-    Object.entries(errors).forEach(item => {
-      showFeedback(item, form)
-    });
+    Object.entries(errors).forEach(item => showFeedback(item, form))
   }
 
-  const showFeedback = ([field, msg], form, hint, input) => {
+  const showFeedback = ([field, msg], form) => {
+    let hint, input;
     if (o.errorsMap[field]) {
       hint = elem(o.errorsMap[field][0])
       input = elem(o.errorsMap[field][1])
