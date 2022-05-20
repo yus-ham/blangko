@@ -1,5 +1,4 @@
 <script>
-  import { onMount } from 'svelte';
   import { Router } from '@roxi/routify';
   import { routes } from '../.routify/routes';
   import { routifyConfig as config } from './utils/common.js';
