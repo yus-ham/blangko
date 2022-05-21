@@ -1,6 +1,5 @@
 let vite;
 
-const cookie = {}
 
 const identity = {
   username: 'admin',
@@ -11,8 +10,9 @@ const identity = {
 const endpoints = {
   '/auth/session': {
     GET(req, res) {
-      if (cookie.rt) {
-        res.end(JSON.stringify({token: btoa(Date.now()), identity}))
+      if (req.cookies.rt) {
+        data = {token: btoa(Date.now()), identity}
+        res.end(JSON.stringify(data))
       } else {
         res.statusCode = 401;
         res.end()
@@ -20,15 +20,14 @@ const endpoints = {
     },
 
     POST(req, res) {
-      if (req.body.get('username') !== identity.username || req.body.get('password') != identity.password) {
-        res.statusCode = 422;
-        return res.end('{"password":"Invalid username or password"}')
+      if (req.body.username !== identity.username || req.body.password != identity.password) {
+        return res.validationError('{"password":"Invalid username or password"}')
       }
 
       const refresh_token = btoa(String(Date.now()).split('').reverse().join())
       res.setHeader('Set-Cookie', 'rt='+ refresh_token)
 
-      return res.end(JSON.stringify({
+      res.end(JSON.stringify({
         token: btoa(Date.now()),
         refresh_token,
         identity
@@ -51,9 +50,17 @@ const endpoints = {
   }
 }
 
+function parseQs(qs) {
+  const data = new URLSearchParams(qs)
+  return [...data].reduce((prev, pair) => {
+    prev[pair[0]] = pair[1]
+    return prev
+  }, {})
+}
+
 const parsers = {
   'application/json': text => JSON.parse(text || "null"),
-  'application/x-www-form-urlencoded': text => new URLSearchParams(text)
+  'application/x-www-form-urlencoded': parseQs,
 }
 
 module.exports = function () {
@@ -62,22 +69,36 @@ module.exports = function () {
       vite = _vite
 
       vite.middlewares.use('/api', async(req, res, next) => {
-        const text = (await require('raw-body')(req)).toString()
-        req.body = text ? parsers[req.headers['content-type']](text) : null
-        next()
-      })
+        if (req.method !== 'GET') {
+          const text = (await require('raw-body')(req)).toString()
+          req.body = text ? parsers[req.headers['content-type']](text) : null
+        }
 
-      vite.middlewares.use('/api', (req, res, next) => {
+        req.cookies = {};
         String(req.headers.cookie).split('; ').forEach(x => {
           x = x.split('=');
-          cookie[x[0]] = x[1];
+          req.cookies[x[0]] = x[1];
         });
+
+        res.validationError = resBody => {
+          res.statusCode = 422
+          res.end(resBody)
+        }
+
         next()
       })
 
       Object.entries(endpoints).forEach(([uri, handler]) => {
         vite.middlewares.use('/api' + uri, (req, res) => {
-          endpoints[uri][req.method](req, res)
+          if (handler[req.method]) {
+            handler[req.method](req, res)
+          } else if (uri) {
+            res.statusCode = 405;
+            res.end()
+          } else {
+            res.statusCode = 404;
+            res.end()
+          }
         })
       })
     }
