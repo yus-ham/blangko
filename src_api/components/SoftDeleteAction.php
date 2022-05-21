@@ -16,13 +16,4 @@ class SoftDeleteAction extends \yii\rest\DeleteAction
         ]);
         return $model;
     }
-
-    public function run($id)
-    {
-        try {
-            parent::run($id);
-        } catch (\Throwable $e) {
-        }
-        Yii::$app->response->statusCode = 204;
-    }
 }

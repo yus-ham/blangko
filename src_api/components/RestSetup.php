@@ -141,10 +141,11 @@ class RestSetup extends \yii\base\Behavior
 
         $action = $event->action;
         if ($actions = Yii::$app->controller->skipAuth ?? null) {
+            if ($actions === true OR $actions === '*') {
+                return true;
+            }
+
             if (is_string($actions)) {
-                if ($actions === '*') {
-                    return true;
-                }
                 $actions = preg_split('/\s*(,|\|)\s*/', $actions);
             }
 
