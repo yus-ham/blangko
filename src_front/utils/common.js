@@ -10,15 +10,16 @@ const wretchAuth = u => wretch(u).headers({ Authorization: 'Bearer ' + $(session
 const parseHeaders = res => {
   res.body.type = String(res.headers.get('Content-Type'));
   res.body.length = +res.headers.get('Content-Length');
+  setPaging(res, 1)
+}
 
-  res.paging = {
-    perPage: +res.headers.get('X-Pagination-Per-Page'),
-    page: +res.headers.get('X-Pagination-Current-Page'),
-    pageCount: +res.headers.get('X-Pagination-Page-Count'),
-    totalData: +res.headers.get('X-Pagination-Total-Count'),
-  };
-  res.paging.offset = (res.paging.page - 1) * res.paging.perPage + 1;
-  res.paging.to = Math.min(res.paging.totalData, res.paging.offset + res.paging.perPage - 1);
+function setPaging(res, page = 1) {
+  const perPage = +res.headers.get('X-Pagination-Per-Page');
+  const totalData = +res.headers.get('X-Pagination-Total-Count');
+  const offset = (page - 1) * perPage + 1;
+  const to = Math.min(totalData, offset + perPage - 1);
+
+  res.paging = {page, perPage, totalData, offset, to};
 }
 
 JSON.fetch = (w, d = {}) => {
@@ -42,16 +43,26 @@ api.fetch = (u, d) => JSON.fetch(wretchAuth(api(u)), d);
 api.data = (u, d) => api.fetch(u, d).then(res => res.data);
 
 api.list = url => {
-  const respon = writable({ paging: {}, data: [], loading: true });
+  const respon = writable({
+    loading: true,
+    paging: {},
+    data: [],
+  });
 
-  async function selectPage(page, reload) {
-    if (reload || this.paging.page != page) {
-      respon.set({ ...$(respon), loading: true });
-      return api.fetch(url + (`${url}`.includes('?') ? '&' : '?') + 'page=' + page).then(setRespon);
-    }
+  function load(page) {
+    if (!page) page = this.paging.page;
+    respon.set({ ...$(respon), loading: true });
+    const _url = url + (`${url}`.includes('?') ? '&' : '?') + 'page=' + page;
+    api.fetch(_url).then(res => {
+        setPaging(res, page)
+        setRespon(res)
+    })
   }
 
-  const setRespon = res => respon.set({ ...res, selectPage, loading: false });
+  function setRespon(res) {
+    respon.set({ ...res, load, loading: false });
+  }
+
   api.fetch(url).then(setRespon);
 
   return respon;

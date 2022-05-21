@@ -4,7 +4,6 @@
 
   let grid;
   let entityPath = '/crud/member'
-
 </script>
 
 <section>
@@ -27,7 +26,7 @@
         <td>{row.name}</td>
         <td>{row.email}</td>
         <td>{row.phone}</td>
-        <td>{new Date(row.dateOfBirth).toString().slice(4, 15)}</td>
+        <td>{new Date(row.dob).toString().slice(4, 15)}</td>
         <td>
           <a title="Edit" href="{entityPath}/{row.id}/edit"><small>[E]</small></a>
           <a title="Delete" data-id="{row.id}" data-method="delete" data-confirm="Are you sure you want to delete this member: `{row.name}`?"><small>[D]</small></a>

@@ -23,6 +23,14 @@
         <a href="/"><i class="ion-stats-bars"></i> <span>Dashboard</span></a>
       </li>
       <li class="has-submenu">
+        <a href="#"><i class="ion-bag"></i> <span>CRUD Example</span></a>
+        <ul class="nav-flyout">
+          <li>
+            <a href="/crud/member"><i class="ion-stats-bars"></i> <span>Data Member</span></a>
+          </li>
+        </ul>
+      </li>
+      <li class="has-submenu">
         <a href="#"><i class="ion-bag"></i> <span>Pages</span></a>
         <ul class="nav-flyout">
           <li>
