@@ -21,6 +21,14 @@
         <a href="/"><i class="ion-stats-bars"></i> <span>Dashboard</span></a>
       </li>
       <li class="has-submenu">
+        <a href="#"><i class="ion-bag"></i> <span>CRUD Example</span></a>
+        <ul class="nav-flyout">
+          <li>
+            <a href="/crud/member"><i class="ion-stats-bars"></i> <span>Data Member</span></a>
+          </li>
+        </ul>
+      </li>
+      <li class="has-submenu">
         <a href="#"><i class="ion-bag"></i> <span>Pages</span></a>
         <ul class="nav-flyout">
           <li>
@@ -30,9 +38,6 @@
             <a href="/contact"><i class="ion-email"></i>Contact</a>
           </li>
         </ul>
-      </li>
-      <li>
-        <a href="/member/profile"><i class="ion-ios-contact"></i> <span class="">Profile</span></a>
       </li>
       <li>
         <a href="/auth/session/sign-in" on:click="{logout}"><i class="ion-log-out"></i> <span class="">Logout</span></a>

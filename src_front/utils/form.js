@@ -6,7 +6,7 @@ const instance = (id, o) => instances[id] = instances[id] || new Processor(id, o
 
 function Processor(id, o = {}) {
   o.errorsMap = o.errorsMap || {};
-  o.errorClass = o.errorClass || window.formErrorClass || ['', ''];
+  o.errorClass = o.errorClass || window.formErrorClass || [];
   o.successClass = o.successClass || window.formSuccessClass || '';
 
   this.submitting = writable(false);
@@ -19,7 +19,7 @@ function Processor(id, o = {}) {
     }
   }
 
-  const w = f => [wretch, wretchAuth][Number(o.checkAuth)](f.action);
+  const w = f => [wretch, wretchAuth][+o.checkAuth||0](f.action);
   const wb = f => ('multipart/form-data' === f.enctype) ? w(f).body(new FormData(f)) : w(f).formUrl(form2Qs(f));
 
   w.get = f => w(f).query(form2Qs(f));
@@ -31,7 +31,7 @@ function Processor(id, o = {}) {
 
     const form = ev.target;
     const p = instances[form.id];
-    const method = form.method || 'get';
+    const method = form.getAttribute('method') || 'get';
     const request = {url: form.action, method: method.toUpperCase()};
 
     p.submitting.set(true);
@@ -44,12 +44,16 @@ function Processor(id, o = {}) {
         })
         .res(async response => {
           p.submitting.set(false)
-          response.json().then(data => {
-            response.data = data;
-            o.success && o.success(data)
-            wretch.dispatchEvent('success', {request, response})
-          })
+          response.json()
+            .then(async data => successResponseCallback(data, request, response))
+            .catch(err => successResponseCallback(null, request, response))
         })
+  }
+
+  const successResponseCallback = async (data, request, response) => {
+    response.data = data;
+    o.success && (await o.success(data))
+    wretch.dispatchEvent('success', {request, response})
   }
 
   const parseErrors = (form, err) => {
@@ -59,7 +63,9 @@ function Processor(id, o = {}) {
     });
   }
 
-  const showFeedback = ([field, msg], form, hint, input) => {
+  const showFeedback = ([field, msg], form) => {
+    let input, hint;
+
     if (o.errorsMap[field]) {
       hint = elem(o.errorsMap[field][0])
       input = elem(o.errorsMap[field][1])
@@ -68,10 +74,10 @@ function Processor(id, o = {}) {
       hint = input.nextElementSibling;
     }
     if (hint) {
-      hint.classList.add(o.errorClass[0]);
+      o.errorClass[0] && hint.classList.add(o.errorClass[0]);
       hint.innerHTML = msg;
     }
-    input && input.classList.add(o.errorClass[1]);
+    input && o.errorClass[1] && input.classList.add(o.errorClass[1]);
   }
 
   const setInitialValue = (form, model) => {
