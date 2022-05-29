@@ -1,22 +1,10 @@
 <script>
-  import { onMount } from 'svelte';
   import GridView from '~/widgets/GridView.svelte';
 
 
   let grid;
   let entityPath = '/crud/member'
 
-  // const {initialize} = createForm('[data-method=delete]', {
-
-  // });
-console.info({GridView})
-
-  onMount(_ => {
-    // initialize($$props.model);
-
-
-    // })
-  });
 </script>
 
 <section>
