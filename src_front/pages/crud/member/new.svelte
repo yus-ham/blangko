@@ -6,7 +6,9 @@
   let entityPath = '/crud/member'
 
   wretch.addEventListener('success', e => {
-    $goto(`${e.detail.response.data.id}/edit`)
+    if (e.detail.request.method === 'POST') {
+      $goto(`${e.detail.response.data.id}/edit`)
+    }
   })
 </script>
 
