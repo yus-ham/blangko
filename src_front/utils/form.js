@@ -4,6 +4,7 @@ import { writable } from 'svelte/store';
 const instances = {};
 const instance = (id, o) => instances[id] = instances[id] || new Processor(id, o);
 
+
 function Processor(id, o = {}) {
   o.errorsMap = o.errorsMap || {};
   o.errorClass = o.errorClass || window.formErrorClass || ['', ''];
@@ -19,8 +20,8 @@ function Processor(id, o = {}) {
     }
   }
 
-  const w = f => [wretch, wretchAuth][Number(o.checkAuth)](f.action);
-  const wb = f => ('multipart/form-data' === f.enctype) ? w(f).body(new FormData(f)) : w(f).formUrl(form2Qs(f));
+  const w = f => [wretch, wretchAuth][+o.checkAuth||0](f.action);
+  const wb = f => f.innerHTML.match(/type=['"]?file/) ? w(f).body(new FormData(f)) : w(f).formUrl(form2Qs(f));
 
   w.get = f => w(f).query(form2Qs(f));
   w.post = f => wb(f);
