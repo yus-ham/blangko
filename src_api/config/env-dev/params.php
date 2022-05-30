@@ -1,5 +1,5 @@
 <?php
 
 return [
-    'jwt' => ['key' => '']
+    'jwtKey' => ''
 ];

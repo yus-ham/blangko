@@ -175,7 +175,7 @@ class User extends \yii\db\ActiveRecord implements \yii\web\IdentityInterface
     {
         $issuedAt       = time();
         $notBefore      = $issuedAt;
-        $expiredTime    = $issuedAt + (3600 * 24 * 30); // Expired dalam 30 hari
+        $expiredTime    = $issuedAt + 60 * 3; // 3 menit
         $hostInfo       = Yii::$app->request->hostInfo;
 
         $token = [
@@ -187,6 +187,6 @@ class User extends \yii\db\ActiveRecord implements \yii\web\IdentityInterface
             'exp' => $expiredTime,
         ];
 
-        return JWT::encode($token, Yii::$app->params['jwt']['key'], Yii::$app->params['jwt']['algorithm']);
+        return JWT::encode($token, Yii::$app->params['jwtKey'], 'HS512');
     }
 }

@@ -106,7 +106,7 @@ class LoginForm extends Model
         $this->_rt = RefreshToken::findOne($data);
             
         if (!$this->_rt) {
-            $this->_rt = new self($data);
+            $this->_rt = new RefreshToken($data);
         }
 
         $this->_rt->value = Yii::$app->security->generateRandomString();

@@ -44,6 +44,7 @@ class SessionController extends \yii\rest\Controller
                 'value' => $model->refreshToken->value,
             ]);
             Yii::$app->response->cookies->add($cookie);
+            Yii::$app->response->statusCode = 201;
         }
 
         return $model;
