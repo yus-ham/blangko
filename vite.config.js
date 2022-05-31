@@ -8,7 +8,12 @@ const __dir = _ => {
     return import.meta.url.replace('file://', '').split('?')[0].replace('/vite.config.js', '')
 }
 
-Object.entries(config.globals||{}).forEach(([key, value]) => globalThis[key] = value)
+const isProd = process.env.NODE_ENV === 'production';
+const plugins = [svelte()];
+
+isProd || plugins.push(restApi());
+
+Object.entries(config.globals||{}).forEach(([key, value]) => globalThis[key] = value);
 
 process.env.PORT && (server.port = process.env.PORT);
 process.env.API_URL && (globalThis.API_URL = process.env.API_URL);
@@ -17,12 +22,7 @@ globalThis.BASE_URL = globalThis.BASE_URL.replace(/\/+$/, '');
 
 export default defineConfig({
     server: config.server,
-
-    plugins: [
-        restApi(),
-        svelte(),
-    ],
-
+    plugins,
     resolve: {
         alias: [
             {find: '~', replacement: __dir() +'/src_front'}
