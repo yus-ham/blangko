@@ -28,4 +28,5 @@ export default defineConfig({
             {find: '~', replacement: __dir() +'/src_front'}
         ]
     },
+    build: {emptyOutDir: false}
 });
