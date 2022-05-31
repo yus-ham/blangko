@@ -10,10 +10,10 @@ const __dir = _ => {
 
 Object.entries(config.globals||{}).forEach(([key, value]) => globalThis[key] = value)
 
-process.env.PORT && (config.server.port = process.env.PORT);
-process.env.BASE_URL && (globalsThis.BASE_URL = process.env.BASE_URL);
+process.env.PORT && (server.port = process.env.PORT);
 process.env.API_URL && (globalThis.API_URL = process.env.API_URL);
-
+process.env.BASE_URL && (globalThis.BASE_URL = process.env.BASE_URL);
+globalThis.BASE_URL = globalThis.BASE_URL.replace(/\/+$/, '');
 
 export default defineConfig({
     server: config.server,
