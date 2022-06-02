@@ -1,12 +1,14 @@
 import { svelte } from '@sveltejs/vite-plugin-svelte';
 import { defineConfig } from 'vite';
-import { globals, server } from './config.env.json';
 import restApi from './src_api/index.js';
 
 const __dir = _ => {
     try { return __dirname } catch(e) {}
     return import.meta.url.replace('file://', '').split('?')[0].replace('/vite.config.js', '')
 }
+
+const globals = {}
+const server = {}
 
 Object.entries(globals||{}).forEach(([key, value]) => globalThis[key] = value)
 
