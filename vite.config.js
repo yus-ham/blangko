@@ -7,7 +7,9 @@ const __dir = _ => {
     return import.meta.url.replace('file://', '').split('?')[0].replace('/vite.config.js', '')
 }
 
-const globals = {}
+const globals = {
+    API_URL: '/api'
+}
 const server = {}
 
 Object.entries(globals||{}).forEach(([key, value]) => globalThis[key] = value)
