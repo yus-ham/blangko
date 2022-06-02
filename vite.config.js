@@ -8,7 +8,8 @@ const __dir = _ => {
 }
 
 const globals = {
-    API_URL: '/api'
+    API_URL: '/api',
+    BASE_URL: '',
 }
 const server = {}
 
@@ -28,8 +29,8 @@ export default defineConfig({
     ],
 
     resolve: {
-        alias: [
-            {find: '~', replacement: __dir() +'/src_front'}
-        ]
+        alias: {
+            '~': __dir() +'/src_front'
+        }
     },
 });
