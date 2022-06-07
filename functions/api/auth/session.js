@@ -1,4 +1,4 @@
-import dataMember from '../data.json';
+// import dataMember from '../data.json';
 
 
 export async function onRequestGet(context) {
