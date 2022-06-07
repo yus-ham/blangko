@@ -13,7 +13,7 @@ export async function onRequestGet(context) {
   } = context;
 
   const  resOpts = {}
-  const data = await request.formData()
+  const data = await request.text()
       // if (req.cookies.rt) {
       //   data = {token: btoa(Date.now()), identity}
       //   res.end(JSON.stringify(data))
