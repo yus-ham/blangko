@@ -12,7 +12,7 @@ export async function onRequestGet(context) {
     // data, // arbitrary space for passing data between middlewares
   } = context;
 
-  const  resOpts = {}
+  const  resOpts = {status: 200}
   const data = await request.text()
       // if (req.cookies.rt) {
       //   data = {token: btoa(Date.now()), identity}
