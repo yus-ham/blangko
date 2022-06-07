@@ -1,6 +1,5 @@
 import { svelte } from '@sveltejs/vite-plugin-svelte';
 import { defineConfig } from 'vite';
-import copy from 'rollup-plugin-copy';
 import restApi from './src_api/index.js';
 
 const __dir = _ => {
@@ -25,7 +24,6 @@ export default defineConfig({
     plugins: [
         restApi(),
         svelte(),
-        // copy({targets: [{src: './src_api/*', dest: './dist/functions/api'}], verbose: true})
     ],
 
     resolve: {

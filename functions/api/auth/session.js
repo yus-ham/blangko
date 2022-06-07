@@ -1,3 +1,6 @@
+import dataMember from '../data.json';
+
+
 export async function onRequestGet(context) {
   // Contents of context object
   const {
@@ -6,10 +9,19 @@ export async function onRequestGet(context) {
     params, // if filename includes [id] or [[path]]
     waitUntil, // same as ctx.waitUntil in existing Worker API
     next, // used for middleware or to fetch assets
-    data, // arbitrary space for passing data between middlewares
+    // data, // arbitrary space for passing data between middlewares
   } = context;
 
-  return new Response("Hello, world!");
+      data = context
+      // if (req.cookies.rt) {
+      //   data = {token: btoa(Date.now()), identity}
+      //   res.end(JSON.stringify(data))
+      // } else {
+      //   res.statusCode = 401;
+      //   res.end()
+      // }
+
+      return new Response(JSON.stringify(data));
 }
 
 export async function onRequestPost(context) {
