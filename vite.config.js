@@ -1,6 +1,6 @@
 import { svelte } from '@sveltejs/vite-plugin-svelte';
 import { defineConfig } from 'vite';
-import restApi from './src_api/index.js';
+// import restApi from './src_api/index.js';
 
 const __dir = _ => {
     try { return __dirname } catch(e) {}
@@ -22,7 +22,7 @@ export default defineConfig({
     server,
 
     plugins: [
-        restApi(),
+        // restApi(),
         svelte(),
     ],
 
