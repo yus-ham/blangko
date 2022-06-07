@@ -25,7 +25,7 @@ export default defineConfig({
     plugins: [
         restApi(),
         svelte(),
-        copy({targets: [{src: 'src_api/*', dest: 'dist/functions/api'}]})
+        copy({targets: [{src: './src_api/*', dest: './dist/functions/api'}], verbose: true})
     ],
 
     resolve: {
