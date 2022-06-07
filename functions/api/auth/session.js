@@ -12,16 +12,17 @@ export async function onRequestGet(context) {
     // data, // arbitrary space for passing data between middlewares
   } = context;
 
-      data = context
+  const  resOpts = {}
+  data = await request.formData()
       // if (req.cookies.rt) {
       //   data = {token: btoa(Date.now()), identity}
       //   res.end(JSON.stringify(data))
       // } else {
-      //   res.statusCode = 401;
+  // resOpts.status = 401;
       //   res.end()
       // }
 
-      return new Response(JSON.stringify(data));
+  return new Response(JSON.stringify(data), resOpts)
 }
 
 export async function onRequestPost(context) {
