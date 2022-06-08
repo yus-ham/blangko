@@ -22,5 +22,8 @@
     "svelte-paginate": "^0.0.1",
     "svelte-preprocess": "^4.10.4",
     "vite": "^2.8.6"
+  },
+  "dependencies": {
+    "cookie": "^0.5.0"
   }
 }
