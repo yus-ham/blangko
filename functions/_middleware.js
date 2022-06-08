@@ -1,8 +1,8 @@
 import cookie from 'cookie';
 
 
-async function parse({request, next}) {
-  request.cookies = await cookie.parse(request.headers.cookie||'') || {};
+async function parse({request, next, data}) {
+  data.cookies = await cookie.parse(request.headers.cookie||'') || {};
   return next()
 }
 

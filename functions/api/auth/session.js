@@ -9,11 +9,11 @@ export async function onRequestGet(context) {
     params, // if filename includes [id] or [[path]]
     waitUntil, // same as ctx.waitUntil in existing Worker API
     next, // used for middleware or to fetch assets
-    // data, // arbitrary space for passing data between middlewares
+    data, // arbitrary space for passing data between middlewares
   } = context;
 
   const  resOpts = {status: 200}
-  const data = await request.cookies
+  //data.cookies
       // if (req.cookies.rt) {
       //   data = {token: btoa(Date.now()), identity}
       //   res.end(JSON.stringify(data))
