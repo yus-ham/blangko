@@ -9,8 +9,7 @@ export async function onRequestGet({data}) {
   let status = 200;
 
   if (data.cookies.rt) {
-    data.token = btoa(Date.now())
-    data.identity = identity;
+    data = {identity, token: btoa(Date.now())}
   } else {
     status = 401;
   }
@@ -20,8 +19,6 @@ export async function onRequestGet({data}) {
 
 export async function onRequestPost({data}) {
   if (data.body.username !== identity.username || data.body.password != identity.password) {
-    data.password = "Invalid username or password"
-    return new Response(JSON.stringify(data), {status: 422})
     return new Response('{"password":"Invalid username or password"}', {status: 422})
   }
 
@@ -39,30 +36,9 @@ export async function onRequestPost({data}) {
   })
 }
 
-export async function onRequestPatch(context) {
-  // Contents of context object
-  const {
-    request, // same as existing Worker API
-    env, // same as existing Worker API
-    params, // if filename includes [id] or [[path]]
-    waitUntil, // same as ctx.waitUntil in existing Worker API
-    next, // used for middleware or to fetch assets
-    data, // arbitrary space for passing data between middlewares
-  } = context;
-
-  return new Response("Hello, world!");
-}
-
-export async function onRequestDelete(context) {
-  // Contents of context object
-  const {
-    request, // same as existing Worker API
-    env, // same as existing Worker API
-    params, // if filename includes [id] or [[path]]
-    waitUntil, // same as ctx.waitUntil in existing Worker API
-    next, // used for middleware or to fetch assets
-    data, // arbitrary space for passing data between middlewares
-  } = context;
-
-  return new Response("Hello, world!");
+export async function onRequestDelete() {
+  return new Response(null, {
+    headers: {'Set-Cookie':'rt=; Max-Age=0'},
+    status: 204,
+  });
 }
