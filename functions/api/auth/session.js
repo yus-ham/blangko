@@ -22,7 +22,7 @@ export async function onRequestPost({request}) {
   const body = {
     // u: await request.formUrl(),
     // d: await request.formData(),
-    t: await request.text()
+    t: await request.formUrl()
   }
 
   if (body.username !== identity.username || body.password != identity.password) {
