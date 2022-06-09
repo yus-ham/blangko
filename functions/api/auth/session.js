@@ -20,6 +20,8 @@ export async function onRequestGet({data}) {
 
 export async function onRequestPost({data}) {
   if (data.body.username !== identity.username || data.body.password != identity.password) {
+    data.password = "Invalid username or password"
+    return new Response(JSON.stringify(data), {status: 422})
     return new Response('{"password":"Invalid username or password"}', {status: 422})
   }
 
