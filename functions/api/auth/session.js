@@ -1,26 +1,19 @@
-// import dataMember from '../data.json';
+const identity = {
+  username: 'admin',
+  password: 123456789,
+  role: 'Administrator',
+}
 
 
-export async function onRequestGet(context) {
-  // Contents of context object
-  const {
-    request, // same as existing Worker API
-    env, // same as existing Worker API
-    params, // if filename includes [id] or [[path]]
-    waitUntil, // same as ctx.waitUntil in existing Worker API
-    next, // used for middleware or to fetch assets
-    data, // arbitrary space for passing data between middlewares
-  } = context;
+export async function onRequestGet({data}) {
+  const resOpts = {status: 200}
 
-  const  resOpts = {status: 200}
-  //data.cookies
-      // if (req.cookies.rt) {
-      //   data = {token: btoa(Date.now()), identity}
-      //   res.end(JSON.stringify(data))
-      // } else {
-  // resOpts.status = 401;
-      //   res.end()
-      // }
+  if (data.cookies.rt) {
+    data.token = btoa(Date.now())
+    data.identity = identity;
+  } else {
+    resOpts.status = 401;
+  }
 
   return new Response(JSON.stringify(data), resOpts)
 }
