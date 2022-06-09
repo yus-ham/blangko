@@ -18,21 +18,14 @@ export async function onRequestGet({data}) {
   return new Response(JSON.stringify(data), {status})
 }
 
-export async function onRequestPost({request}) {
-  const body = {
-    // u: await request.formUrl(),
-    // d: await request.formData(),
-    t: await request.formUrl()
-  }
-
-  if (body.username !== identity.username || body.password != identity.password) {
-    return new Response(JSON.stringify(body), {status: 422})
+export async function onRequestPost({data}) {
+  if (data.body.username !== identity.username || data.body.password != identity.password) {
     return new Response('{"password":"Invalid username or password"}', {status: 422})
   }
 
   const refresh_token = btoa(String(Date.now()).split('').reverse().join())
 
-  const data = JSON.stringify({
+  data = JSON.stringify({
       token: btoa(Date.now()),
       refresh_token,
       identity,

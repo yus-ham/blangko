@@ -16,7 +16,7 @@ function parseQs(req) {
 
 export const onRequest = [
   async function parse({request, next, data}) {
-    data.cookies = await cookie.parse(request.headers.cookie||'') || {};
+    data.cookies = await cookie.parse(request.headers.get('cookie')||'') || {};
 
     const type = request.headers.get('content-type')
     if (type && parsers[type]) {
