@@ -21,7 +21,7 @@ export async function onRequestGet({data}) {
 export async function onRequestPost({request}) {
   const body = {
     // u: await request.formUrl(),
-    d: await request.formData(),
+    // d: await request.formData(),
     t: await request.text()
   }
 
