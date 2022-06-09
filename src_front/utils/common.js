@@ -1,7 +1,7 @@
 import { listen } from 'svelte/internal';
 import { get as $, writable } from 'svelte/store';
 import { session, prevUrl } from './store.js';
-import { goto, url } from '@roxi/routify';
+import { redirect, url } from '@roxi/routify';
 import wretch from './wretch.esm.js';
 
 
@@ -78,15 +78,18 @@ export const routifyConfig = {
 export const getSession = _ => $(session) || JSON.fetch(wretch(api('auth/session'), {credentials: 'include', mode: 'cors'})).then(x => x.data ? session.set(x.data) || x.data : x);
 
 export const authenticate = res => {
-  if (res.status === 401)
+  if (res.status === 401) {
+    session.set(undefined)
     return openAuthForm()
+  }
+  session.set(res.data)
 }
 
 export const openAuthForm = _ => {
   if (!$(prevUrl))
     prevUrl.set($(url)().slice(BASE_URL.length));
 
-  return $(goto)(signInUrl)||'';
+  return $(redirect)(signInUrl)||'';
 }
 
 !(function () {

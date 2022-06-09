@@ -1,10 +1,12 @@
 <script>
+  import { goto } from '@roxi/routify';
   import { session, prevUrl } from '~/utils/store.js';
 
-  const logout = _ => {
-    wretchAuth(api('auth/session')).delete().res(_ => {
-      $prevUrl = null;
-      $session = null;
+  const logout = e => {
+    wretchAuth('/api/auth/session').delete().res(_ => {
+      $prevUrl = undefined;
+      $session = undefined;
+      $goto('/auth/session/sign-in')
     })
   }
 </script>
@@ -40,7 +42,7 @@
         </ul>
       </li>
       <li>
-        <a href="/auth/session/sign-in" on:click="{logout}"><i class="ion-log-out"></i> <span class="">Logout</span></a>
+        <a href="#logout" on:click="{logout}"><i class="ion-log-out"></i> <span class="">Logout</span></a>
       </li>
     </ul>
   </nav>
