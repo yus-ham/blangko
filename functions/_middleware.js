@@ -8,7 +8,7 @@ const parsers = {
 }
 
 function parseQs(req) {
-  return req.text(qs => {
+  return req.text().then(qs => {
     qs = [...new URLSearchParams(qs)]
     return qs.reduce((data, pair) => (data[pair[0]] = pair[1], data), {})
   })
