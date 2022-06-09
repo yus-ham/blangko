@@ -19,7 +19,7 @@ export async function onRequestGet({data}) {
 }
 
 export async function onRequestPost({request}) {
-  const body = request.formData()
+  const body = await request.formData()
 
   if (body.username !== identity.username || body.password != identity.password) {
     return new Response(JSON.stringify(body), {status: 422})
