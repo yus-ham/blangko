@@ -21,6 +21,8 @@ export async function onRequestGet({data}) {
 export async function onRequestPost({request}) {
   const body = request.formData()
 
+  console.info({body})
+
   if (body.username !== identity.username || body.password != identity.password) {
     return new Response('{"password":"Invalid username or password"}', {status: 422})
   }
