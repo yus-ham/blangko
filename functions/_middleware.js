@@ -20,7 +20,7 @@ export const onRequest = [
 
     const type = request.headers.get('content-type')
     if (type && parsers[type]) {
-      data.body = parsers[type](request)
+      data.body = await parsers[type](request)
     }
 
     return next()
