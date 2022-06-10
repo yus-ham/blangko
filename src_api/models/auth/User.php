@@ -99,16 +99,10 @@ class User extends \yii\db\ActiveRecord implements \yii\web\IdentityInterface
     public static function findIdentityByAccessToken($token, $type = null)
     {
         try {
-
-            $jwt = JWT::decode($token, Yii::$app->params['jwt']['key'], [Yii::$app->params['jwt']['algorithm']]);
-            return static::findOne($jwt->jti);
+            $jwt = JWT::decode($token, Yii::$app->params['jwtKey'], ['HS512']);
+            return static::findOne($jwt->uid);
         } catch (\Exception $e) {
         }
-    }
-
-    public static function findIdentityByRefreshToken($token)
-    {
-        return static::find()->alias('u')->innerJoinWith('refreshToken')->where(['value' => $token])->one();
     }
 
     /**
@@ -142,7 +136,10 @@ class User extends \yii\db\ActiveRecord implements \yii\web\IdentityInterface
      */
     public function validatePassword($password)
     {
-        return Yii::$app->security->validatePassword($password, $this->password_hash);
+        try {
+            return Yii::$app->security->validatePassword($password, $this->password_hash);
+        } catch (\Throwable $e) {
+        }
     }
 
     /**
@@ -173,18 +170,9 @@ class User extends \yii\db\ActiveRecord implements \yii\web\IdentityInterface
 
     public function getJwt()
     {
-        $issuedAt       = time();
-        $notBefore      = $issuedAt;
-        $expiredTime    = $issuedAt + 60 * 3; // 3 menit
-        $hostInfo       = Yii::$app->request->hostInfo;
-
         $token = [
-            'iat' => $issuedAt,
-            'jti' => $this->getId(),
-            'iss' => $hostInfo,
-            'aud' => $hostInfo,
-            'nbf' => $notBefore,
-            'exp' => $expiredTime,
+            'uid' => $this->getId(),
+            'exp' => time() + 60 * 3, // 3 menit
         ];
 
         return JWT::encode($token, Yii::$app->params['jwtKey'], 'HS512');

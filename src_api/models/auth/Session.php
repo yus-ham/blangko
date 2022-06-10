@@ -4,21 +4,14 @@ namespace app\models\auth;
 use Yii;
 use yii\base\Model;
 
-/**
- * LoginForm is the model behind the login form.
- *
- * @property User|null $user This property is read-only.
- *
- */
-class LoginForm extends Model
+class Session extends Model
 {
+    public $type;
     public $username;
     public $password;
-    public $email;
     public $rememberMe = true;
-
-    private $_rt;
     private $_user = false;
+    private $_rt;
 
     /**
      * @return array the validation rules.
@@ -26,19 +19,31 @@ class LoginForm extends Model
     public function rules()
     {
         return [
+            ['type', 'required'],
             ['username', 'trim'],
-            // username and password are both required
-            [['username', 'password'], 'required'],
-            // rememberMe must be a boolean value
             ['rememberMe', 'boolean'],
-            // password is validated by validatePassword()
-            ['password', 'validatePassword'],
+            [['username', 'password'], 'safe'],
         ];
     }
 
-    public function login()
+    public function getPrimaryKey()
     {
-        return $this->validate() && $this->createRefreshToken();
+        return [$this->token];
+    }
+
+    public function save()
+    {
+        if (!$this->validate()) {
+            return;
+        }
+
+        if ($this->type === 'basic') {
+            $this->validateBasic() && $this->createRefreshToken();
+        } else {
+            $this->validateRefreshToken();
+        }
+
+        return !$this->hasErrors();
     }
 
     /**
@@ -48,16 +53,30 @@ class LoginForm extends Model
      * @param string $attribute the attribute currently being validated
      * @param array $params the additional name-value pairs given in the rule
      */
-    public function validatePassword($attribute, $params)
+    public function validateBasic()
     {
-        if (!$this->hasErrors()) {
-            $user = $this->getUser();
-            if (!$user || !$user->validatePassword($this->password)) {
-                $this->addError($attribute, 'Periksa lagi username atau password yang anda masukkan.');
-            }
+        $user = $this->getUser();
+        if (!$user || !$user->validatePassword($this->password)) {
+            return $this->addError('password', 'Periksa lagi username atau password yang anda masukkan.');
         }
+        return true;
     }
 
+    public function validateRefreshToken()
+    {
+        $this->_rt = $token = RefreshToken::find()->joinWith('user')->where(['value' => $this->password])->one();
+
+        if (!$token) {
+            return $this->addError('password', 'Invalid token');
+        }
+
+        if ($token->expired_at < time()) {
+            return $this->addError('password', 'Token Expired');
+        }
+
+        return $this->_user = $token->user;
+    }
+    
     /**
      * Finds user by [[username]]
      *
@@ -96,7 +115,7 @@ class LoginForm extends Model
         return $this->_rt;
     }
 
-    public function createRefreshToken()
+    protected function createRefreshToken()
     {
         $data = [
             'user_ip' => Yii::$app->request->userIP,
@@ -104,14 +123,14 @@ class LoginForm extends Model
         ];
 
         $this->_rt = RefreshToken::findOne($data);
-            
+
         if (!$this->_rt) {
             $this->_rt = new RefreshToken($data);
         }
-
+        
+        $this->_rt->expired_at = time() + 60 * 60 * 24;
         $this->_rt->value = Yii::$app->security->generateRandomString();
-        $this->_rt->save(false);
-    
-        return $this->_rt;
+
+        return $this->_rt->save(false);
     }
 }
