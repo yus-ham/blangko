@@ -31,9 +31,6 @@ abstract class ActiveController extends \yii\rest\ActiveController
         return Yii::createObject([
             'class' => \yii\data\ActiveDataProvider::class,
             'query' => call_user_func([$modelClass ?: $this->modelClass, 'find']),
-            'pagination' => [
-                'defaultPageSize' => 10,
-            ],
         ]);
     }
 }

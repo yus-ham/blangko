@@ -1,25 +1,19 @@
 <?php
 
-$feConfig = json_decode(file_get_contents($ROOT .'../config.env.json'));
-
-return [
+$config = [
     'components' => [
         'request' => [
             // !!! insert a secret key in the following (if it is empty) - this is required by cookie validation
             'cookieValidationKey' => '',
         ],
     ],
+];
 
-    'as rest' => [
-        'cors' => [
-            'Origin' => ['http://localhost:'.$feConfig->server->port],
-            'Access-Control-Allow-Credentials' => true
-        ]
-    ],
 
-    'bootstrap' => ['debug'],
-    'modules' => [
-        'debug' => [
+if (YII_ENV_DEV)
+{
+    $config['bootstrap'][] = 'debug';
+    $config['modules']['debug'] = [
             'class' => 'yii\debug\Module',
             // uncomment the following to add your IP if you are not connecting from localhost.
             //'allowedIPs' => ['127.0.0.1', '::1'],
@@ -40,6 +34,11 @@ return [
                     ],
                 ],
             ],
-        ]
-    ]
-];
+    ];
+}
+else
+{
+    $config['components']['log']['targets']['file']['maskVars'] = ['_POST.password', '_POST.LoginForm.password'];
+}
+
+return $config;

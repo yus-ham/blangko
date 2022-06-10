@@ -10,7 +10,7 @@ return [
 
         'log' => [
             'targets' => [
-                [
+                'file' => [
                     'class' => 'yii\log\FileTarget',
                     'levels' => ['error', 'warning'],
                 ],
