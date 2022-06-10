@@ -23,20 +23,8 @@ class RestSetup extends \yii\base\Behavior
                 $this->handleCors();
                 $this->setupRest();
                 $this->registerUrlRule();
-                // Yii::$app->attachBehavior('cors', [
-                //     'class' => 'yii\filters\Cors',
-                    // 'cors' => [
-                    //      // restrict access to
-                    //      'Origin' => ['*'],
-                    //      // Allow only POST and PUT methods
-                    //     //  'Access-Control-Request-Method' => ['POST', 'PUT'],
-                    //      // Allow only headers 'X-Wsse'
-                    //      'Access-Control-Request-Headers' => ['X-Wsse'],
-                    // ]
-                // ]);
             },
             'beforeAction' => function (ActionEvent $event) {
-                // $this->handlePreflightRequest($event);
                 $this->userHasAccess($event);
                 $this->setPaginationClass($event->action);
             },
@@ -45,13 +33,19 @@ class RestSetup extends \yii\base\Behavior
 
     protected function handleCors()
     {
+        $req = Yii::$app->request;
+        if (!$req->origin or $req->origin === $req->hostInfo) {
+            return;
+        }
+
         $filter = new \yii\filters\Cors();
 
-        if ($this->cors) {
-            foreach ($this->cors as $key => $value) {
-                $filter->cors[$key] = $value;
-            }
+        foreach ((array) $this->cors as $key => $value) {
+            $filter->cors[$key] = $value;
         }
+
+        $filter->cors['Access-Control-Expose-Headers'][] = 'X-Pagination-Per-Page';
+        $filter->cors['Access-Control-Expose-Headers'][] = 'X-Pagination-Total-Count';
 
         $dummyAction = (object)['id' => 0];
         if (!$filter->beforeAction($dummyAction)) {
