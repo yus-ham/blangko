@@ -39,18 +39,17 @@ function Processor(id, o = {}) {
     clearErrorOnChanges(form);
 
     w[method](form)[method]()
-        .error(422, err => {
-          p.submitting.set(false)
-          parseErrors(form, err)
+        .error(422, err => parseErrors(form, err))
+        .res(response => {
+          response.json().then(data => successResponseCallback(data, request, response))
         })
-        .res(async response => {
-          p.submitting.set(false)
-          response.json().then(data => {
-            response.data = data;
-            o.success && o.success(data)
-            wretch.dispatchEvent('success', {request, response})
-          })
-        })
+        .finally(_ => p.submitting.set(false))
+  }
+
+  const successResponseCallback = async (data, request, response) => {
+    response.data = data;
+    o.success && (await o.success(data))
+    wretch.dispatchEvent('success', {request, response})
   }
 
   const parseErrors = (form, err) => {
