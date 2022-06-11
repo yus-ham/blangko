@@ -21,7 +21,7 @@ module.exports = {
                 [/{#debug /gim, '{@debug '],
                 [/{#html /gim, '{@html '],
 
-                ['$_GLOBAL_BASE_URL', globalThis.BASE_URL],
+                ['$_GLOBAL_BASE_URL', String(globalThis.BASE_URL||'').replace(/\/+$/, '')],
                 ['$_GLOBAL_API_URL', globalThis.API_URL],
             ]
         }),

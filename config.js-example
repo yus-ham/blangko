@@ -1,9 +1,8 @@
-module.exports = {
+globalThis.BASE_URL = '/';
+globalThis.API_URL = 'http://localhost:8000/api';
 
-    globals: {
-        BASE_URL: '',
-        API_URL: 'http://localhost:8000/api',
-    },
+
+module.exports = {
 
     sessionApi: {
         key: '',
