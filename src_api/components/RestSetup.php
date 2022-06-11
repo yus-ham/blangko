@@ -2,7 +2,6 @@
 
 namespace app\components;
 
-use ReflectionMethod;
 use yii\base\ActionEvent;
 use yii\filters\auth\HttpBearerAuth;
 use yii\helpers\Inflector;
@@ -49,6 +48,7 @@ class RestSetup extends \yii\base\Behavior
 
         $dummyAction = (object)['id' => 0];
         if (!$filter->beforeAction($dummyAction)) {
+            Yii::$app->response->format = 'json';
             Yii::$app->end();
         }
     }
@@ -58,7 +58,6 @@ class RestSetup extends \yii\base\Behavior
         Yii::$app->request->parsers['application/json'] = 'yii\web\JsonParser';
         Yii::$app->request->parsers['multipart/form-data'] = 'yii\web\MultipartFormDataParser';
         Yii::$app->request->enableCsrfValidation = false;
-        Yii::$app->response->format = 'json';
         Yii::$app->response->on('beforeSend', [$this, 'formatResponse']);
         Yii::$app->user->loginUrl = null;
         Yii::$app->user->enableSession = false;
@@ -149,7 +148,7 @@ class RestSetup extends \yii\base\Behavior
         }
 
         if ($action instanceof InlineAction) {
-            $method = new ReflectionMethod(Yii::$app->controller, 'action' . Inflector::classify($action->id));
+            $method = new \ReflectionMethod(Yii::$app->controller, 'action' . Inflector::classify($action->id));
             if (preg_match('/\s@skip-auth\s/', $method->getDocComment())) {
                 return;
             }
@@ -167,6 +166,11 @@ class RestSetup extends \yii\base\Behavior
 
     public function formatResponse(yii\base\Event $e)
     {
+        if (Yii::$app->controller->module->id === 'debug') {
+            return;
+        }
+
+        Yii::$app->response->format = 'json';
         $data = Yii::$app->response->data;
 
         if ($ex = Yii::$app->errorHandler->exception) {
