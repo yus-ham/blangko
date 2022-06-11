@@ -1,0 +1,16 @@
+module.exports = {
+
+    globals: {
+        BASE_URL: '',
+        API_URL: 'http://localhost:8000/api',
+    },
+
+    sessionApi: {
+        key: '',
+        baseUrl: '/api',
+    },
+
+    devServer: {
+        port: 5000
+    }
+}

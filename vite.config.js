@@ -1,6 +1,6 @@
 import { svelte } from '@sveltejs/vite-plugin-svelte';
 import { defineConfig } from 'vite';
-import { globals, server } from './config.env.json';
+import { globals, devServer as server } from './config.js';
 import restApi from './src_api';
 
 const __dir = _ => {
