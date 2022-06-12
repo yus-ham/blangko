@@ -3,4 +3,4 @@
 .DS_Store
 .routify
 dist
-config.env.json
+config.js
