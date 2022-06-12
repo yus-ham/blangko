@@ -1,0 +1,10 @@
+globalThis.BASE_URL = '/';
+globalThis.API_URL = '/api';
+
+
+module.exports = {
+
+    devServer: {
+        port: 5000
+    }
+}
