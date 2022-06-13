@@ -15,7 +15,7 @@
     {#if sess.status === 401}
       <slot />
     {#else}
-      {$goto('/')}
+      {$goto('/')||''}
     {#endif}
   {#endawait}
 {#endif}
