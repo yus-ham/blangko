@@ -9,8 +9,9 @@
     "start": "polkadot server.js",
     "build": "run-s build:*",
     "build:routify": "routify -b --pages src_front/pages",
-    "build:vite": "vite build"
-  },
+    "build:vite": "vite build",
+    "postinstall": "node -e 'require(\"./svelte.config.js\").copyConfig()'"
+},
   "devDependencies": {
     "@roxi/routify": "^2",
     "@sveltejs/vite-plugin-svelte": "^1.0.0-next.48",

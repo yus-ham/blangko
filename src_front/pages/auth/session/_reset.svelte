@@ -1,9 +1,7 @@
 <script>
   import { getSession } from '~/utils/common.js';
-  import { session } from '~/utils/store.js';
+  import { session, redirectData } from '~/utils/store.js';
   import { goto } from '@roxi/routify';
-
-console.info({$session})
 </script>
 
 
@@ -17,7 +15,7 @@ console.info({$session})
     {#if sess.status === 401}
       <slot />
     {#else}
-      {$goto('/')||''}
+      {$goto($redirectData.prevUrl || '/') ||''}
     {#endif}
   {#endawait}
 {#endif}

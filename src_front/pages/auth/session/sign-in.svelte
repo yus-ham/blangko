@@ -1,7 +1,6 @@
 <script>
   import createForm from '~/utils/form.js';
-  import { session, prevUrl } from '~/utils/store.js';
-  import { goto } from '@roxi/routify';
+  import { session } from '~/utils/store.js';
   import { onMount } from 'svelte';
 
 
@@ -11,10 +10,8 @@
     errorClass: ['text-danger'],
     errorsMap: {password: ['.hint']},
 
-    success(data) {
-      $session = data;
-      $goto($prevUrl || '/')
-    }
+    // this will trigger $goto(prevUrl), @see _reset.svelte
+    success: (data) => $session = data,
   });
 
   onMount(initialize);
