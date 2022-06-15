@@ -1,5 +1,6 @@
 <script>
   import { goto } from '@roxi/routify';
+  import { redirectData } from '~/utils/store';
   import Form from './_form.svelte';
 
 
@@ -7,6 +8,7 @@
 
   wretch.addEventListener('success', e => {
     if (e.detail.request.method === 'POST') {
+      $redirectData.model = e.detail.response.data;
       $goto(`${e.detail.response.data.id}/edit`)
     }
   })
