@@ -1,6 +1,6 @@
 import { listen } from 'svelte/internal';
 import { get as $, writable } from 'svelte/store';
-import { session, prevUrl } from './store.js';
+import { session, redirectData } from './store.js';
 import { redirect, url } from '@roxi/routify';
 import wretch from './wretch.esm.js';
 
@@ -86,8 +86,8 @@ export const authenticate = res => {
 }
 
 export const openAuthForm = _ => {
-  if (!$(prevUrl))
-    prevUrl.set($(url)().slice(BASE_URL.length));
+  if (!$(redirectData).prevUrl)
+    redirectData.set({prevUrl: location.pathname});
 
   return $(redirect)(signInUrl)||'';
 }
