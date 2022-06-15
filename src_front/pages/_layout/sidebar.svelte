@@ -1,10 +1,10 @@
 <script>
   import { goto } from '@roxi/routify';
-  import { session, prevUrl } from '~/utils/store.js';
+  import { session, redirectData } from '~/utils/store.js';
 
   const logout = e => {
     wretchAuth('/api/auth/session').delete().res(_ => {
-      $prevUrl = undefined;
+      $redirectData.prevUrl = undefined;
       $session = undefined;
       $goto('/auth/session/sign-in')
     })
