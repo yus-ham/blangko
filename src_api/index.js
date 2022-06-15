@@ -1,8 +1,10 @@
-import { serveSessionApi } from '../server';
+import { serveSession } from '../server';
 
 
 export default function () {
   return {
-    configureServer: vite => vite.middlewares.use(serveSessionApi)
+    configureServer: vite => {
+      vite.middlewares.use(serveSession)
+    }
   }
 }
