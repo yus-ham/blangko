@@ -142,7 +142,9 @@ async function serveResource(req, res, next) {
     res = await services[route][req.method].apply(ctx, args)
     send(ctx.res, resCode, res)
   } catch (e) {
-    console.error('service error: ', e)
+    if (!e.code || e.code >= 500) {
+      throw e;
+    }
     send(ctx.res, e.code, e.detail)
   }
 }
