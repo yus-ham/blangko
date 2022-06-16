@@ -3,7 +3,7 @@
 
 
   let grid;
-  let resource = '/crud/member'
+  let resource = '/crud/member';
 </script>
 
 <section>

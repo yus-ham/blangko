@@ -4,7 +4,7 @@
   import Form from './_form.svelte';
 
 
-  let resource = '/crud/member'
+  let resource = '/crud/member';
 
   wretch.addEventListener('success', e => {
     if (e.detail.request.method === 'POST') {

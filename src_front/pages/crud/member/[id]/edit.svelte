@@ -9,7 +9,7 @@
 
   const getModel = () => $redirectData.model
                  ? {data: $redirectData.model}
-                 : api.fetch(`${resourcr}/${$params.id}`)
+                 : api.fetch(`${resource}/${$params.id}`)
 </script>
 
 
