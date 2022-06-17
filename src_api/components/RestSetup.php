@@ -164,23 +164,22 @@ class RestSetup extends \yii\base\Behavior
         }
     }
 
-    public function formatResponse(yii\base\Event $e)
+    public function formatResponse(yii\base\Event $ev)
     {
-        if (Yii::$app->controller->module->id === 'debug') {
+        if (Yii::$app->controller && Yii::$app->controller->module->id === 'debug') {
             return;
         }
 
         Yii::$app->response->format = 'json';
-        $data = Yii::$app->response->data;
 
-        if ($ex = Yii::$app->errorHandler->exception) {
-        } else {
+        if (!Yii::$app->errorHandler->exception) {
+            $data = Yii::$app->response->data;
             if (is_array($data) && isset($data[0]['message'])) {
-                $respon = [];
+                $result = [];
                 foreach ($data as $i => $error) {
-                    $respon[$error['field']] = $error['message'];
+                    $result[$error['field']] = $error['message'];
                 }
-                Yii::$app->response->data = $respon;
+                Yii::$app->response->data = $result;
             }
         }
     }
