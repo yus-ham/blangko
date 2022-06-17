@@ -1,12 +1,11 @@
 <script>
   import { getSession } from '~/utils/common.js';
-  import { session, redirectData } from '~/utils/store.js';
-  import { goto } from '@roxi/routify';
+  import { session } from '~/utils/store.js';
 </script>
 
 
 {#if $session === undefined}
-  <!-- redirected from elsewhere -->
+  <!-- redirected by logout button -->
   <slot />
 {#else} <!-- no referer -->
   {#await getSession()}
@@ -14,8 +13,6 @@
   {#then sess}
     {#if sess.status === 401}
       <slot />
-    {#else}
-      {$goto($redirectData.prevUrl || '/') ||''}
     {#endif}
   {#endawait}
 {#endif}
