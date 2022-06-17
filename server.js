@@ -143,18 +143,19 @@ function serveStatic(req, res, next) {
     let stream = sendStream(req, req._parsedUrl.pathname, { root })
 
     stream.on('error', err => {
-      if (err.status === 404) {
-        let dir = err.path.slice(0, err.path.lastIndexOf('/'))
-        if (dir !== root) {
-          return stream.sendIndex(root)
-        }
+      if (err.status !== 404) {
+        next(err)
       }
 
-      next(err)
+      let dir = err.path.slice(0, err.path.lastIndexOf('/'))
+      if (dir === err.path) {
+        next(err)
+      }
+
+      return stream.sendIndex(root)
     })
 
     stream.on('end', _ => res.end())
-
     stream.pipe(res)
   })  
 }
