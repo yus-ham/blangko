@@ -18,8 +18,7 @@ pnpm start
 
 
 ### Demo User
-> username: admin
-> password: 123456789
+> username: admin<br> password: 123456789
 
 
 ### Development
