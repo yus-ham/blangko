@@ -137,7 +137,7 @@ class User extends \yii\db\ActiveRecord implements \yii\web\IdentityInterface
     public function validatePassword($password)
     {
         try {
-            return Yii::$app->security->validatePassword($password, $this->password_hash);
+            return Yii::$app->security->validatePassword("$password", $this->password_hash);
         } catch (\Throwable $e) {
         }
     }
@@ -149,7 +149,7 @@ class User extends \yii\db\ActiveRecord implements \yii\web\IdentityInterface
      */
     public function setPassword($password)
     {
-        $this->password_hash = Yii::$app->security->generatePasswordHash($password);
+        $this->password_hash = Yii::$app->security->generatePasswordHash("$password");
     }
 
     public function fields()

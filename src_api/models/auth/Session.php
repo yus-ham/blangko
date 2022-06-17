@@ -26,12 +26,7 @@ class Session extends Model
         ];
     }
 
-    public function getPrimaryKey()
-    {
-        return [$this->token];
-    }
-
-    public function save()
+    public function login()
     {
         if (!$this->validate()) {
             return;
