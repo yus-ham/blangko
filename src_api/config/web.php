@@ -37,10 +37,6 @@ return yii\helpers\ArrayHelper::merge(
             'assetManager' => ['appendTimestamp' => true],
         ],
         'as rest' => ['class' => 'app\components\RestSetup'],
-        'params' => yii\helpers\ArrayHelper::merge(
-            require $ROOT .'config/params.php',
-            require $ROOT .'config/env/params.php',
-        ),
     ],
     require $ROOT .'config/env/common.php',
     require $ROOT .'config/env/web.php',

@@ -14,5 +14,8 @@ return [
             'username' => '',
             'password' => '',
         ],
+    ],
+    'params' => [
+        'jwtKey' => ''
     ]
 ];

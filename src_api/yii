@@ -11,10 +11,9 @@
 
 $ROOT = str_replace('\\', '/', __DIR__) .'/';
 
-$config = require $ROOT .'config/env/common.php';
 require $ROOT .'config/bootstrap.php';
 
-$config = yii\helpers\ArrayHelper::merge($config, require $ROOT .'config/console.php');
+$config = yii\helpers\ArrayHelper::merge([], require $ROOT .'config/console.php');
 $application = new yii\console\Application($config);
 
 exit($application->run());
