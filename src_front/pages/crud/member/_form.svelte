@@ -48,7 +48,7 @@
       <div>
         <label>Birth Date</label>
         <div>
-          <input name="dateOfBirth" type="date" />
+          <input name="dob" type="date" />
           <div/>
         </div>
       </div>
