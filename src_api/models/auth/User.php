@@ -137,7 +137,9 @@ class User extends \yii\db\ActiveRecord implements \yii\web\IdentityInterface
     public function validatePassword($password)
     {
         try {
-            return Yii::$app->security->validatePassword("$password", $this->password_hash);
+            // $2b$ is prefix created by nodejs bcrypt library
+            $hash = str_replace('$2b$', '$2y$', $this->password_hash);
+            return Yii::$app->security->validatePassword("$password", $hash);
         } catch (\Throwable $e) {
         }
     }
