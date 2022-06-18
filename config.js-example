@@ -1,5 +1,5 @@
 globalThis.BASE_URL = '';
-globalThis.API_URL = 'http://localhost:8000';
+globalThis.API_URL = 'http://localhost:8080';
 
 
 module.exports = {
