@@ -6,7 +6,7 @@
     "dev": "run-p dev:*",
     "dev:routify": "routify --pages src_front/pages",
     "dev:vite": "vite",
-    "start": "polkadot server.js",
+    "start": "polkadot src_api/app.js",
     "build": "run-s build:*",
     "build:routify": "routify -b --pages src_front/pages",
     "build:vite": "vite build",
@@ -22,7 +22,6 @@
     "vite": "^2.9.12"
   },
   "dependencies": {
-    "@polka/send-type": "^0.5.2",
     "polkadot": "^1.0.0",
     "send": "^0.18.0"
   }

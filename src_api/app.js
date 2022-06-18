@@ -14,13 +14,18 @@ module.exports = async function (req, res) {
     if (!err.code || err.code >= 500 || err.code < 200) {
       console.error(err)
     }
-    res.statusCode = err.code || 500;
-    res.end()
+    send(res, err.code || 500)
   }
 }
 
 
-const send = require('@polka/send-type');
+function send(res, code = 200, data) {
+  res.statusCode = code;
+  if (data && typeof data === 'object') {
+    data = JSON.stringify(data)
+  }
+  res.end(data)
+}
 
 module.exports.serveSession = serveSession;
 function serveSession(req, res, next) {
@@ -44,7 +49,8 @@ function serveSession(req, res, next) {
           return send(ctx.res, 401)
         }
 
-        send(ctx.res, 201, apiRes.data, {'Set-Cookie': 'rt=' + apiRes.json().refresh_token + '; HttpOnly=true'})
+        ctx.res.setHeader('Set-Cookie', 'rt=' + apiRes.json().refresh_token + '; HttpOnly=true')
+        send(ctx.res, 201, apiRes.data)
       },
 
       async POST() {
@@ -54,16 +60,16 @@ function serveSession(req, res, next) {
           return send(ctx.res, 422, apiRes.data)
         }
 
-        const headers = {}
         if (apiRes.statusCode === 201) {
-          headers['Set-Cookie'] = 'rt=' + apiRes.json().refresh_token + '; HttpOnly=true';
+          ctx.res.setHeader('Set-Cookie', 'rt=' + apiRes.json().refresh_token + '; HttpOnly=true')
         }
 
-        send(ctx.res, apiRes.statusCode, apiRes.data, headers)
+        send(ctx.res, apiRes.statusCode, apiRes.data)
       },
 
       async DELETE() {
-        send(ctx.res, 204, '', {'Set-Cookie': 'rt=; Max-Age=0; HttpOnly=true' })
+        ctx.res.setHeader('Set-Cookie', 'rt=; Max-Age=0; HttpOnly=true')
+        send(ctx.res, 204)
       }
     })[req.method]()
   })
@@ -103,7 +109,7 @@ function parseCookies(req) {
 }
 
 const { request } = require('http');
-const { sessionApi } = require('./config.js');
+const { sessionApi } = require('../config.js');
 
 function sessionApiRequest(body = null) {
   const opts = {
@@ -131,7 +137,7 @@ function sessionApiRequest(body = null) {
 
 
 const sendStream = require('send');
-const root = __dirname + '/dist';
+const root = require('path').join(__dirname, '/../dist')
 
 function serveStatic(req, res, next) {
   if (req.method !== 'GET' && req.method !== 'HEAD') {

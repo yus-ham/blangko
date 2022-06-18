@@ -1,4 +1,4 @@
-import { serveSession } from '../server';
+import { serveSession } from './app';
 
 
 export default function () {
