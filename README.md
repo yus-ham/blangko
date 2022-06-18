@@ -12,6 +12,7 @@ git clone https://github.com/yus-ham/blangko.git --depth 1 --single-branch -b ap
 cd <PROJECT_NAME>
 
 pnpm install
+pnpm knex migrate:latest --knexfile ./src_api/knexfile.js 
 pnpm build
 pnpm start
 ```
