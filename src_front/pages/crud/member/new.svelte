@@ -7,7 +7,7 @@
   let resource = '/crud/member';
 
   wretch.addEventListener('success', e => {
-    if (e.detail.request.method === 'POST') {
+    if (e.detail.request.method === 'POST' && e.detail.request.url.includes(resource)) {
       $redirectData.model = e.detail.response.data;
       $goto(`${e.detail.response.data.id}/edit`)
     }
