@@ -4,6 +4,17 @@ globalThis.API_URL = '/api';
 
 module.exports = {
 
+    jwtKey: '',
+
+    db: {
+        client: 'mysql',
+        host: '127.0.0.1',
+        port: 3306,
+        user: '',
+        password: '',
+        database: 'blangko'
+    },
+
     devServer: {
         port: 5000
     }

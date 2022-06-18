@@ -35,9 +35,10 @@ module.exports = {
     },
 
     copyConfig() {
-        let fs = require('fs')
+        let cfg, fs = require('fs')
         if (!fs.existsSync('./config.js')) {
-            let cfg = fs.readFileSync('./config.js-example', 'utf8')
+            cfg = fs.readFileSync('./config.js-example', 'utf8')
+            cfg = cfg.replace("jwtKey: ''", "jwtKey: '"+ Buffer.from(Date.now()) +"'").toString('base64')
             fs.writeFileSync('./config.js', cfg, {encoding: 'utf8'})
         }
     }

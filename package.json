@@ -6,20 +6,29 @@
     "dev": "run-p dev:*",
     "dev:routify": "routify --pages src_front/pages",
     "dev:vite": "vite",
-    "preview": "vite preview",
     "build": "run-s build:*",
     "build:routify": "routify -b --pages src_front/pages",
     "build:vite": "vite build",
+    "start": "polkadot src_api/app.js",
     "postinstall": "node -e 'require(\"./svelte.config.js\").copyConfig()'"
-},
+  },
   "devDependencies": {
-    "@roxi/routify": "^2",
-    "@sveltejs/vite-plugin-svelte": "^1.0.0-next.39",
+    "@roxi/routify": "^2.18.7",
+    "@sveltejs/vite-plugin-svelte": "^1.0.0-next.49",
     "npm-run-all": "^4.1.5",
-    "raw-body": "^2.5.1",
-    "svelte": "^3.46.4",
+    "svelte": "^3.48.0",
     "svelte-paginate": "^0.0.1",
-    "svelte-preprocess": "^4.10.4",
-    "vite": "^2.8.6"
+    "svelte-preprocess": "^4.10.7",
+    "vite": "^2.9.12"
+  },
+  "dependencies": {
+    "bcrypt": "^5.0.1",
+    "cookie": "^0.5.0",
+    "formidable": "^2.0.1",
+    "jsonwebtoken": "^8.5.1",
+    "knex": "^2.1.0",
+    "mysql": "^2.18.1",
+    "polkadot": "^1.0.0",
+    "send": "^0.18.0"
   }
 }
