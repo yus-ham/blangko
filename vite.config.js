@@ -27,6 +27,6 @@ export default defineConfig({
     ],
 
     resolve: {
-        alias: {'~': __dir() +'/src_front'}
+        alias: {'~': __dirname +'/src_front'}
     },
 });
