@@ -98,7 +98,7 @@ const services = {
         throw error(422, { password: 'Invalid username or password' })
       }
 
-      const refresh_token = Buffer.from(''+ Date.now()).toString('base64').split('').reverse().join())
+      const refresh_token = Buffer.from(''+ Date.now()).toString('base64').split('').reverse().join('')
       this.res.setHeader('Set-Cookie', 'rt=' + refresh_token + '; HttpOnly')
 
       return { token: Buffer.from(''+ Date.now()).toString('base64'), refresh_token, identity };
