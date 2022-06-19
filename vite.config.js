@@ -1,32 +1,30 @@
 import { svelte } from '@sveltejs/vite-plugin-svelte';
 import { defineConfig } from 'vite';
-// import restApi from './src_api/index.js';
+// import { devServer } from './config/.js';
+// import restApi from './src_api';
 
-const __dir = _ => {
-    try { return __dirname } catch(e) {}
-    return import.meta.url.replace('file://', '').split('?')[0].replace('/vite.config.js', '')
-}
 
+const {PORT, NODE_ENV} = process.env;
 const globals = {API_URL: '/api', BASE_URL: ''};
-const server = {};
+const dev = NODE_ENV !== 'production';
 
-Object.entries(globals||{}).forEach(([key, value]) => globalThis[key] = value)
-
-
-process.env.PORT && (server.port = process.env.PORT);
-process.env.BASE_URL && (globalThis.BASE_URL = process.env.BASE_URL);
-process.env.API_URL && (globalThis.API_URL = process.env.API_URL);
+for (let ENV_VAR in globals) {
+    if (process.env[ENV_VAR]) {
+        globalThis[ENV_VAR] = process.env[ENV_VAR];
+    }
+}
 
 
 export default defineConfig({
-    server,
-
+    base: globalThis.BASE_URL||'/',
+    // server: {...devServer, port: PORT||devServer.port},
+    server: {},
     plugins: [
-        // restApi(),
         svelte(),
+        // dev && restApi()
     ],
-
     resolve: {
         alias: {'~': __dirname +'/src_front'}
     },
+    build: {emptyOutDir: false}
 });

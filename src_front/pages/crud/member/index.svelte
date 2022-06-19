@@ -3,15 +3,14 @@
 
 
   let grid;
-  let entityPath = '/crud/member'
-
+  let resource = '/crud/member';
 </script>
 
 <section>
   <h1>Data Member</h1>
 
-  <GridView api-url="{entityPath}" bind:this="{grid}">
-      <div slot="buttons"><a href="{entityPath}/new">Tambah</a></div>
+  <GridView api-url="{resource}" bind:this="{grid}">
+      <div slot="buttons"><a href="{resource}/new">Tambah</a></div>
 
       <tr slot="columns">
         <th>#</th>
@@ -27,9 +26,9 @@
         <td>{row.name}</td>
         <td>{row.email}</td>
         <td>{row.phone}</td>
-        <td>{new Date(row.dateOfBirth).toString().slice(4, 15)}</td>
+        <td>{new Date(row.dob).toString().slice(4, 15)}</td>
         <td>
-          <a title="Edit" href="{entityPath}/{row.id}/edit"><small>[E]</small></a>
+          <a title="Edit" href="{resource}/{row.id}/edit"><small>[E]</small></a>
           <a title="Delete" data-id="{row.id}" data-method="delete" data-confirm="Are you sure you want to delete this member: `{row.name}`?"><small>[D]</small></a>
         </td>
       </tr>
