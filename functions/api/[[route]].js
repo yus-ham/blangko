@@ -90,7 +90,7 @@ const services = {
         throw error(401)
       }
 
-      return { token: btoa(Date.now()), identity }
+      return { token: Buffer.from(Date.now()).toString('base64'), identity }
     },
 
     POST() {
@@ -98,10 +98,10 @@ const services = {
         throw error(422, { password: 'Invalid username or password' })
       }
 
-      const refresh_token = btoa(String(Date.now()).split('').reverse().join())
+      const refresh_token = Buffer.from(Date.now()).toString('base64').split('').reverse().join())
       this.res.setHeader('Set-Cookie', 'rt=' + refresh_token + '; HttpOnly')
 
-      return { token: btoa(Date.now()), refresh_token, identity };
+      return { token: Buffer.from(Date.now()).toString('base64'), refresh_token, identity };
     },
 
     DELETE() {
@@ -136,18 +136,21 @@ export async function onRequest({ data, request, params, env }) {
   const headers = {};
 
   const service = {
-    res: {setHeader: (key, value) => headers[key] = value},
-    action: services[route][request.method],
-    cookies: data.cookies,
+    res: {
+      setHeader(key, value) {
+        headers[key] = value;
+      }
+    },
+    cookies: data.cookies || {},
     body: data.body,
   }
 
-  let status = 200;
+  let result, status = 200;
   if (request.method === 'POST') status = 201;
   else if (request.method === 'DELETE') status = 204;
 
   try {
-    result = await service.action(params.route[2])
+    result = await services[route][request.method].call(service, params.route[2])
   } catch (err) {
     status = err.code || 500;
     result = err.detail || err.message || err;
