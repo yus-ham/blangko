@@ -22,7 +22,7 @@ module.exports = {
                 [/{#html /gim, '{@html '],
 
                 ['$_GLOBAL_BASE_URL', String(globalThis.BASE_URL||'').replace(/\/+$/, '')],
-                ['$_GLOBAL_API_URL', globalThis.API_URL],
+                ['$_GLOBAL_API_URL', globalThis.API_URL||'/api'],
             ]
         }),
     ],
