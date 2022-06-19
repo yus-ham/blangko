@@ -39,7 +39,7 @@ const services = {
     POST() {
       let hasError;
       let errors = {};
-      let fields = { name: 'Name', email: 'Email', phone: 'Phone', dateOfBirth: 'Birth Date' };
+      let fields = { name: 'Name', email: 'Email', phone: 'Phone', dob: 'Birth Date' };
 
       for (let field in fields) {
         if (!this.body[field]) {
@@ -98,7 +98,8 @@ const services = {
         throw error(422, { password: 'Invalid username or password' })
       }
 
-      this.res.setHeader('Set-Cookie', 'rt=' + randomStr() + '; HttpOnly')
+      const refresh_token = randomStr()
+      this.res.setHeader('Set-Cookie', 'rt=' + refresh_token + '; HttpOnly')
 
       return { token: randomStr(), refresh_token, identity };
     },
