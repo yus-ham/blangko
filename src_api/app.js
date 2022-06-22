@@ -110,22 +110,13 @@ const services = {
 }
 
 
-module.exports = function (req, res) {
-  return [
-    next => serveResource(req, res, next),
-    next => serveStatic(req, res, next),
-  ]
-  .reduce((fn, next) => fn(next))
-}
-
 module.exports.serveResource = serveResource;
 async function serveResource(req, res, next) {
-  if (req._parsedUrl.pathname.slice(0, 4) !== '/api') {
-    return next && next();
+  if (req._parsedUrl.pathname.slice(0, 5) !== '/api/') {
+    return next && next()
   }
 
   let [_, route, _id] = req._parsedUrl.pathname.match(/^\/api(\/.+?)(\/\d*)?$/)
-  let method = req.method.toLowerCase()
 
   if (!services[route]) {
     return send(res, 404)
@@ -135,10 +126,11 @@ async function serveResource(req, res, next) {
     return send(res, 405)
   }
 
-  let ctx = {req, res, method};
+  let ctx = {req, res};
 
   try {
     let { args, resCode } = await getActionMeta(ctx, _id)
+    console.info({req})
     res = await services[route][req.method].apply(ctx, args)
     send(ctx.res, resCode, res)
   } catch (e) {
@@ -149,37 +141,6 @@ async function serveResource(req, res, next) {
   }
 }
 
-
-const sendStream = require('send');
-const root = require('path').resolve(__dirname + '/../dist');
-
-function serveStatic(req, res) {
-  if (req.method !== 'GET' && req.method !== 'HEAD') {
-    res.setHeader('Allow', 'GET, HEAD')
-    return send(res, 405)
-  }
-
-  return new Promise(resolve => {
-    let stream = sendStream(req, req._parsedUrl.pathname, { root })
-
-    stream.on('error', err => {
-      if (err.status === 404) {
-        let dir = err.path.slice(0, err.path.lastIndexOf('/'))
-        if (dir !== root) {
-          return stream.sendIndex(root)
-        }
-      }
-
-      send(res, err.status)
-    })
-
-    stream.on('end', _ => res.end())
-
-    stream.pipe(res)
-  })
-}
-
-module.exports.parseQs = parseQs;
 function parseQs(qs) {
   const data = new URLSearchParams(qs)
   return [...data].reduce((prev, pair) => {
@@ -194,15 +155,21 @@ const parsers = {
 }
 
 
-const getRawBody = require('raw-body');
-async function parseBody(ctx) {
-  if (!['POST', 'PATCH'].includes(ctx.req.method)) {
-    return;
-  }
+function parseBody(ctx) {
+  return new Promise((resolve) => {
+    if (!['POST', 'PATCH'].includes(ctx.req.method)) {
+      return resolve()
+    }
 
-  return getRawBody(ctx.req).then(body => {
-    body = body.toString()
-    ctx.body = body ? parsers[ctx.req.headers['content-type']](body) : null;
+    let body = '';
+    ctx.req.on('data', chunk => {
+      body += chunk.toString()
+    })
+    
+    ctx.req.on('end', () => {
+      ctx.body = body ? parsers[ctx.req.headers['content-type']](body) : null;
+      resolve()
+    })
   })
 }
 

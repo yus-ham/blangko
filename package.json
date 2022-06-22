@@ -11,7 +11,7 @@
     "build:routify": "routify -b --pages src_front/pages",
     "build:vite": "vite build",
     "postinstall": "node -e 'require(\"./svelte.config.js\").copyConfig()'"
-},
+  },
   "devDependencies": {
     "@roxi/routify": "^2",
     "@sveltejs/vite-plugin-svelte": "^1.0.0-next.39",
@@ -20,8 +20,5 @@
     "svelte-paginate": "^0.0.1",
     "svelte-preprocess": "^4.10.4",
     "vite": "^2.8.6"
-  },
-  "dependencies": {
-    "raw-body": "^2.5.1"
   }
 }
