@@ -112,10 +112,6 @@ const services = {
 
 module.exports.serveResource = serveResource;
 async function serveResource(req, res, next) {
-  if (req._parsedUrl.pathname.slice(0, 5) !== '/api/') {
-    return next && next()
-  }
-
   let [_, route, _id] = req._parsedUrl.pathname.match(/^\/api(\/.+?)(\/\d*)?$/)
 
   if (!services[route]) {
@@ -130,7 +126,6 @@ async function serveResource(req, res, next) {
 
   try {
     let { args, resCode } = await getActionMeta(ctx, _id)
-    console.info({req})
     res = await services[route][req.method].apply(ctx, args)
     send(ctx.res, resCode, res)
   } catch (e) {
@@ -189,7 +184,7 @@ function parseCookies(req) {
 
 function getActionMeta(ctx, _id) {
   ctx.cookies = parseCookies(ctx.req);
-  ctx.params = parseQs(ctx.req._parsedUrl.query);
+  ctx.params = parseQs(ctx.req._parsedUrl.search.slice(1));
 
   const meta = { args: [], resCode: 200 };
 
