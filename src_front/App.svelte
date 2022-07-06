@@ -1,10 +1,16 @@
 <script>
   import { Router } from '@roxi/routify';
   import { routes } from '../.routify/routes';
-  import { routifyConfig as config } from './utils/common.js';
 
   globalThis.BASE_URL = "$_GLOBAL_BASE_URL";
   globalThis.API_URL = "$_GLOBAL_API_URL";
+
+  const config = {
+    urlTransform: {
+      apply: u => u.startsWith('/') ? BASE_URL + u : location.pathname + '/../' + u, // for browser
+      remove: u => u === BASE_URL ? '/' : u.substr(BASE_URL.length), // for routify
+    }
+  }
 </script>
 
 
