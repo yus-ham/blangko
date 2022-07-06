@@ -1,7 +1,7 @@
 import { listen } from 'svelte/internal';
 import { get as $, writable } from 'svelte/store';
 import { session, redirectData } from './store.js';
-import { redirect, url } from '@roxi/routify';
+import { redirect } from '@roxi/routify';
 import wretch from './wretch.esm.js';
 
 
@@ -50,8 +50,8 @@ api.list = url => {
   });
 
   function load(page) {
+    respon.set({...$(respon), loading: true })
     if (!page) page = this.paging.page;
-    respon.set({ ...$(respon), loading: true });
     const _url = url + (`${url}`.includes('?') ? '&' : '?') + 'page=' + page;
     api.fetch(_url).then(res => {
         setPaging(res, page)
