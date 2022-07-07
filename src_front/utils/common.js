@@ -50,8 +50,8 @@ api.list = url => {
   });
 
   function load(page) {
+    respon.set({...$(respon), loading: true })
     if (!page) page = this.paging.page;
-    respon.set({ ...$(respon), loading: true });
     const _url = url + (`${url}`.includes('?') ? '&' : '?') + 'page=' + page;
     api.fetch(_url).then(res => {
         setPaging(res, page)
@@ -68,14 +68,7 @@ api.list = url => {
   return respon;
 }
 
-export const routifyConfig = {
-  urlTransform: {
-    apply: u => u.startsWith('/') ? BASE_URL + u : location.pathname + '/../' + u, // for browser
-    remove: u => u === BASE_URL ? '/' : u.substr(BASE_URL.length), // for routify
-  }
-}
-
-export const getSession = _ => $(session) || JSON.fetch(wretch('/api/auth/session', {credentials: 'include', mode: 'cors'})).then(x => x.data ? session.set(x.data) || x.data : x);
+export const getSession = _ => $(session) || JSON.fetch(wretch(api('auth/session'), {credentials: 'include', mode: 'cors'})).then(x => x.data ? session.set(x.data) || x.data : x);
 
 export const authenticate = res => {
   if (res.status === 401) {
