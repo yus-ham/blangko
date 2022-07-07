@@ -1,7 +1,7 @@
 import { svelte } from '@sveltejs/vite-plugin-svelte';
 import { defineConfig } from 'vite';
 import { devServer } from './config.js';
-import restApi from './src_api';
+import restApi from './src_api/index_frontend-dev';
 
 
 const {PORT, NODE_ENV} = process.env;

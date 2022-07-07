@@ -1,0 +1,11 @@
+POST http://localhost:8788/api/auth/session
+content-type: application/json
+
+{
+    "username": "admin",
+    "password": "123456789"
+}
+
+###
+
+GET http://localhost:8788/api/crud/member
