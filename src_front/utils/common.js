@@ -1,7 +1,7 @@
 import { listen } from 'svelte/internal';
 import { get as $, writable } from 'svelte/store';
 import { session, redirectData } from './store.js';
-import { redirect, url } from '@roxi/routify';
+import { redirect } from '@roxi/routify';
 import wretch from './wretch.esm.js';
 
 
@@ -50,8 +50,8 @@ api.list = url => {
   });
 
   function load(page) {
+    respon.set({...$(respon), loading: true })
     if (!page) page = this.paging.page;
-    respon.set({ ...$(respon), loading: true });
     const _url = url + (`${url}`.includes('?') ? '&' : '?') + 'page=' + page;
     api.fetch(_url).then(res => {
         setPaging(res, page)
@@ -66,13 +66,6 @@ api.list = url => {
   api.fetch(url).then(setRespon);
 
   return respon;
-}
-
-export const routifyConfig = {
-  urlTransform: {
-    apply: u => u.startsWith('/') ? BASE_URL + u : location.pathname + '/../' + u, // for browser
-    remove: u => u === BASE_URL ? '/' : u.substr(BASE_URL.length), // for routify
-  }
 }
 
 export const getSession = _ => $(session) || JSON.fetch(wretch(api('auth/session'), {credentials: 'include', mode: 'cors'})).then(x => x.data ? session.set(x.data) || x.data : x);
