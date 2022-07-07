@@ -16,26 +16,7 @@
 {#endawait}
 
 <style global>
-  body {
-    font-family: "Lato";
-    font-size: 100%;
-    overflow-y: scroll;
-    font-family: sans-serif;
-    -ms-text-size-adjust: 100%;
-    -webkit-text-size-adjust: 100%;
-    -ms-text-size-adjust: 100%;
-    -webkit-text-size-adjust: 100%;
-    -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
-    text-rendering: optimizeLegibility;
-  }
-  #routify-app {
-    height: 100vh;
-  }
-  main {
-    padding-top: 30px;
-    padding-left: 50px;
-    margin-left: 17em;
-  }
+  #routify-app {height: 100vh;}
+  main {padding: 0  15px;}
 </style>
   
