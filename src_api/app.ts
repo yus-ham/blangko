@@ -38,11 +38,6 @@ async function serveResource(ctx: Context) {
         const result = await action({...common, req: ctx.req, params: ctx.parsedUrl.searchParams})
         return new Response(postAction(result), {status: resCode})
     } catch (err) {
-        console.info('serveResource try catchh',{
-            err, t:typeof err, code:err.code, name:err.name, 
-            // yes:err.message.includes('Cannot find module'), 
-        })
-
         if (err && err.name === 'ResolveError') {
             return;
         }
