@@ -88,7 +88,7 @@ async function parse(ctx: Context) {
     ctx.req.params = ctx.parsedUrl.searchParams
 
     if (['POST', 'PATCH', 'PUT'].includes(ctx.req.method)) {
-        return new Promise((resolve) => {
+        return new Promise(async(resolve) => {
             ctx.req.body = await parsers[req.headers.get('content-type')](ctx.req)
             resolve()
         })
