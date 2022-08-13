@@ -53,17 +53,9 @@ function postAction(result) {
 
 
 const parsers = {
-    'application/json': req => req.text(text  => JSON.parse(text || "null")),
-    'application/x-www-form-urlencoded': req => req.text(parseQs),
+    'application/json': req => req.text().then(json  => JSON.parse(json || "null")),
+    'application/x-www-form-urlencoded': req => req.text().then(qs => new URLSearchParams(qs)),
     'multipart/form-data': parseFormData,
-}
-
-function parseQs(qs) {
-    const data = new URLSearchParams(qs)
-    return [...data].reduce((prev, pair) => {
-      prev[pair[0]] = pair[1]
-      return prev
-    }, {})
 }
 
 async function parseFormData(req) {
@@ -89,7 +81,7 @@ async function parse(ctx: Context) {
 
     if (['POST', 'PATCH', 'PUT'].includes(ctx.req.method)) {
         return new Promise(async(resolve) => {
-            ctx.req.body = await parsers[req.headers.get('content-type')](ctx.req)
+            ctx.req.body = await parsers[ctx.req.headers.get('content-type')](ctx.req)
             resolve()
         })
     }
