@@ -2,5 +2,6 @@
 **/.history/
 .DS_Store
 .routify
+database/blangko.sqlite
 dist
-config.js
+config.ts

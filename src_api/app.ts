@@ -2,52 +2,84 @@ import Bun from 'bun';
 import path from 'path';
 import fs from 'fs';
 import cookie from 'cookie';
-import common from './lib/common';
+import common from './lib/common.ts';
+import '../config.ts';
 
 
-type Context = {req: Request, parsedUrl: URL}
+class Context {
+    constructor(req: Request) {
+        this.req = req;
+        this.parsedUrl = new URL(req.url)
+
+        const res = {
+            status: 200,
+            headers: new Headers()
+        }
+
+        this.res = () => res;
+        this.res.status = (code) => {
+            res.status = code;
+            return this.res
+        }
+        this.res.cookie = (key: string, value = '', opts = {}) => {
+            let cookieStr;
+            opts.path = globalThis.API_URL;
+            if (!value) {
+                cookieStr = `${key}=; Path=${opts.path}; MaxAge=0; HttpOnly`;
+            } else {
+                opts.httpOnly = true;
+                cookieStr = cookie.serialize(key, value, opts)
+            }
+            res.headers.append('Set-Cookie', cookieStr)
+            return this.res
+        }
+    }
+
+}
 
 const  serviceCache = {}
 
-async function serveResource(ctx: Context) {
-    if (ctx.parsedUrl.pathname.slice(0, 4) !== '/api') {
+async function serveResource(ctx) {
+    if (ctx.parsedUrl.pathname.slice(0, 4) !== globalThis.API_URL) {
         return;
     }
 
-    try {
-        await parse(ctx)
-        let { Service, allows, resCode, args } = await getActionMeta(ctx)
+    await parse(ctx)
+    let { Service, allows, resCode, args } = await getActionMeta(ctx)
 
-        if (!Service) {
-            return new Response('', {status: 404})
-        }
-
-        const action = Service['onRequest' + ctx.req.method[0] + ctx.req.method.slice(1).toLowerCase()]
-
-        if (!action) {
-            return new Response('', {
-                status: 405,
-                headers: {'Allow': allows.join(', ')}
-            })
-        }
-
-        for (let key in args) {
-            ctx.parsedUrl.searchParams.set(key, args[key])
-        }
-
-        const result = await action({...common, req: ctx.req, params: ctx.parsedUrl.searchParams})
-        return new Response(postAction(result), {status: resCode})
-    } catch (err) {
-        if (err && err.name === 'ResolveError') {
-            return;
-        }
-
-        return new Response('', {status: err.code})
+    if (!Service) {
+        return new Response('', {status: 404})
     }
+
+    const action = Service['onRequest' + ctx.req.method[0] + ctx.req.method.slice(1).toLowerCase()]
+
+    if (!action) {
+        return new Response('', {
+            status: 405,
+            headers: {'Allow': allows.join(', ')}
+        })
+    }
+
+    for (let key in args) {
+        ctx.parsedUrl.searchParams.set(key, args[key])
+    }
+
+    ctx.params = ctx.parsedUrl.searchParams;
+    const result = await action(ctx.req, ctx.res)
+    let res = ctx.res();
+
+    if (res.status >= 400) {
+        res.data = '';
+        resCode = res.status;
+    } else {
+        res.data = postAction(result)
+    }
+
+    return new Response(res.data, {status: resCode, headers: res.headers})
 }
 
 function postAction(result) {
-    return result ? JSON.stringify(result) : '';
+    return JSON.stringify(result)
 }
 
 
@@ -67,7 +99,7 @@ async function parseFormData(req) {
             if (done) {
                 return resolve(new URLSearchParams(data))
             }
-            data += new TextDecoder().decode(chunk)
+            data += (new TextDecoder).decode(chunk)
             reader.read().then(processChunk)
         }
 
@@ -156,9 +188,18 @@ function runMiddleware(fns: Function[], ctx: Context) {
     }
 
     if (result && result.then) {
-        return result.then(res => {
-            return res || runMiddleware(fns, ctx)
-        })
+        return result
+            .then(res => res || runMiddleware(fns, ctx))
+            .catch(err => {
+                if (!err.status) {
+                    console.error(err)
+                    err.status = 500;
+                    err.detail = err.message;
+                } else {
+                    err.detail = postAction(err.detail)
+                }
+                return new Response(err.detail, err)
+            })
     }
 }
 
@@ -168,7 +209,7 @@ console.log('Server running on localhost:3000');
 export default {
     fetch(req: Request) {
         console.info('FetchEvent:',req.url)
-        const ctx = {req, parsedUrl: new URL(req.url)}
+        const ctx = new Context(req)
 
         return runMiddleware([
             serveStatic,
@@ -176,10 +217,6 @@ export default {
             _ => new Response(Bun.file(root + '/index.html'))
         ], ctx)
 
-    },
-
-    error(err: Error) {
-        console.error('default.error',err)
     },
 
     // this is called when fetch() throws or rejects

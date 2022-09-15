@@ -1,9 +1,9 @@
-import common from '../lib/common';
-import config from '../../config';
-// import Bcrypt from 'bcrypt';
+import common from '../lib/common.ts';
+import config from '../../config.ts';
+import Bcrypt from 'bcryptjs';
 import Jwt from 'jsonwebtoken';
-import RefreshToken from './refresh-token';
-import User from './user';
+import RefreshToken from './refresh-token.ts';
+import User from './user.ts';
 
 
 export default {
@@ -12,39 +12,41 @@ export default {
         select username,role.name as role from user
         join refresh_token on user.id=user_id
         join role on role.id=role_id
-        where value=?
-    `, [rt])
+        where value=? limit 1`,
+    [rt])
 
-    console.info({result})
-
-    if (result) {
-      return {
-        token: Buffer.from(config.jwtKey + Date.now()).toString('base64'),
-        identity: {username:result.username, role:result.role}
-      }
+    if (result[0]) {
+        return {
+            token: Buffer.from(config.jwtKey + Date.now()).toString('base64'),
+            identity: { username: result[0].username, role: result[0].role }
+        }
     }
   },
 
   async loginByPassword(info) {
-    const errors = {password: `Username or password invalid.`}
-    const identity = await User.findByUsername(info.username)
+    const errors = { password: `Username or password invalid.` }
+    const identity = await User.findByUsername(info.get('username'))
+
     if (!identity) {
-      return common.invalid(errors);
+        return common.invalidValueError(errors)
     }
 
-    const valid = Bcrypt.compareSync(info.password, '$2b$'+ identity.password_hash.slice(4))
+    const valid = Bcrypt.compareSync(info.get('password'), '$2b$'+ identity.password_hash.slice(4))
     if (!valid) {
-      return invalid(errors)
+        return common.invalidValueError(errors)
     }
 
+    info.client_id = info.get('client_id')
     info.user_id = identity.id;
     identity.role = identity.name;
     delete identity.password_hash;
 
-    return {
-      identity,
-      token: Jwt.sign({id: identity.id}, jwtKey),
-      refresh_token: (await RefreshToken.getOrCreate(info)).value,
-    }
+    return RefreshToken.getOrCreate(info)
+        .then(rt => ({
+            identity,
+            token: Jwt.sign({ id: identity.id }, config.jwtKey),
+            refresh_token: rt.value,
+        }))
+        .catch(err => common.invalidValueError(errors))
   }
 }

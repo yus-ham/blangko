@@ -8,9 +8,9 @@ export default function({connection, client}) {
 
     const db = new Database(connection.filename);
 
-    db.raw = async function(sql: string, params?: string[]) {
-        let stmt = db.query(sql)
-        return Promise.resolve(stmt.run.apply(stmt, params))
+    db.raw = function(sql, params = []) {
+        const stmt = db.query(sql)
+        return Promise.resolve(stmt.all.apply(stmt, params))
     }
 
     return db;

@@ -2,7 +2,9 @@ const globals = [...'onReady,elems,elem,createElem,show,hide,trigger,listen,wret
 
 
 module.exports = {
-    disableDependencyReinclusion: ['@roxi/routify'],
+    vitePlugin: {
+        disableDependencyReinclusion: ['@roxi/routify'],
+    },
 
     preprocess: [
         require('svelte-preprocess')({

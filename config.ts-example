@@ -1,0 +1,25 @@
+globalThis.BASE_URL = '/';
+globalThis.API_URL = '/api';
+
+
+export default {
+
+    sessionApi: {
+        key: 'ahYtsaKjf5BB7821JnxXw',
+        baseUrl: '/api',
+    },
+
+    db: {
+        // client: 'mysql',
+        host: '127.0.0.1',
+        port: 3306,
+        user: 'root',
+        password: 'root',
+        database: 'blangko1',
+
+        client: 'sqlite3',
+        filename: __dirname +'/database/blangko.sqlite',
+    },
+
+    jwtKey: 'secretKey1234',
+}
