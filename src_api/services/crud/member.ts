@@ -1,30 +1,29 @@
-import Model from '../../models/member';
+import common from '../../lib/common.ts';
+import Model from '../../models/member.ts';
 
 
 export default {
 
-    async onRequestGet(id) {
-        if (id) {
-            const model = await Model.find().where('id', id).first()
-            return model || this.httpError(404)
+    async onRequestGet(req, res) {
+        if (req.params.get('id')) {
+            return await Model.findOne(req.params.get('id')) || res.status(404)
         }
 
-        const { total } = await Model.find().count('id as total').first()
-        let paging = this.createPager(total)
+        const total = await Model.findTotalCount()
+        let paging = common.createPager({req, res}, total)
 
-        return total ? Model.find().limit(paging.limit).offset(paging.offset) : [];
+        return total ? Model.findAll(paging.limit, paging.offset) : [];
     },
 
-    async onRequestPost() {
-        return Model.insert(this.body)
+    async onRequestPost(req) {
+        return Model.insert(req.body)
     },
 
-    async onRequestPatch(id) {
-        let res = await Model.update(id, this.body)
-        return res || this.httpError(404)
+    async onRequestPatch(req, res) {
+        return await Model.update(req.params.get('id'), req.body) || res.status(404)
     },
 
-    async onRequestDelete(id) {
-        return Model.delete(id)
+    async onRequestDelete(req) {
+        return Model.delete(req.params.get('id'))
     }
 }

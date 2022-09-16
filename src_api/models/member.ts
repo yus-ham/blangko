@@ -1,11 +1,8 @@
-// const { knex } = require('../lib/common');
-import activeRecord from '../lib/active-record';
+import activeRecord from '../lib/active-record.ts';
 
-
-const table = 'member';
 
 export default {
-    ...activeRecord(table),
+    ...activeRecord({table: `member`}),
 
     preSave(data) {
         if (!data) {

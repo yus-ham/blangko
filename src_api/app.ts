@@ -2,7 +2,6 @@ import Bun from 'bun';
 import path from 'path';
 import fs from 'fs';
 import cookie from 'cookie';
-import common from './lib/common.ts';
 import '../config.ts';
 
 
@@ -11,12 +10,10 @@ class Context {
         this.req = req;
         this.parsedUrl = new URL(req.url)
 
-        const res = {
-            status: 200,
-            headers: new Headers()
-        }
+        const res = {status: 200}
 
         this.res = () => res;
+        this.res.headers = new Headers()
         this.res.status = (code) => {
             res.status = code;
             return this.res
@@ -30,11 +27,10 @@ class Context {
                 opts.httpOnly = true;
                 cookieStr = cookie.serialize(key, value, opts)
             }
-            res.headers.append('Set-Cookie', cookieStr)
+            this.res.headers.append('Set-Cookie', cookieStr)
             return this.res
         }
     }
-
 }
 
 const  serviceCache = {}
@@ -75,7 +71,7 @@ async function serveResource(ctx) {
         res.data = postAction(result)
     }
 
-    return new Response(res.data, {status: resCode, headers: res.headers})
+    return new Response(res.data, {status: resCode, headers: ctx.res.headers})
 }
 
 function postAction(result) {
@@ -86,8 +82,16 @@ function postAction(result) {
 
 const parsers = {
     'application/json': req => req.text().then(json  => JSON.parse(json || "null")),
-    'application/x-www-form-urlencoded': req => req.text().then(qs => new URLSearchParams(qs)),
+    'application/x-www-form-urlencoded': req => req.text().then(parseQs),
     'multipart/form-data': parseFormData,
+}
+
+function parseQs(qs) {
+    const result = {};
+    (new URLSearchParams(qs)).forEach((value, key) => {
+        result[key] = value
+    })
+    return result
 }
 
 async function parseFormData(req) {
@@ -126,7 +130,7 @@ async function getActionMeta(ctx: Context) {
     let allows;
 
     if (!Service) {
-        Service = serviceCache[route] = (await import(dir + route)).default;
+        Service = serviceCache[route] = (await import(dir + route).then(x => x.default).catch(err => void 0))
 
         if (!Service) {
             const slashPos = route.lastIndexOf('/')
@@ -147,13 +151,12 @@ async function getActionMeta(ctx: Context) {
     }
 
     let resCode = 200;
-    let args = {}
 
-    if (['GET', 'PATCH', 'DELETE'].includes(ctx.req.method)) args.id = id;
+    if (id && ['GET', 'PATCH', 'DELETE'].includes(ctx.req.method)) ctx.req.params.set('id', id)
     if (ctx.req.method === 'POST') resCode = 201;
     else if (ctx.req.method === 'DELETE') resCode = 204;
 
-    return { Service, resCode, allows, args }
+    return { Service, resCode, allows }
 }
 
 
