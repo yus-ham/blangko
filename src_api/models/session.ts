@@ -8,7 +8,7 @@ import User from './user.ts';
 
 export default {
   async loginByToken(rt = null) {
-    const result = await common.knex().raw(`
+    const result = await common.db().raw(`
         select username,role.name as role from user
         join refresh_token on user.id=user_id
         join role on role.id=role_id

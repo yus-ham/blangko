@@ -1,15 +1,15 @@
 import cfg from '../../config.ts';
-import knex from './knex.ts';
+import db from './db.ts';
 
 
-let _knex;
+let _db;
 
 export default {
-    knex() {
-        if (!_knex) {
-            _knex = knex({ connection: cfg.db, client: cfg.db.client })
+    db() {
+        if (!_db) {
+            _db = knex({ connection: cfg.db, client: cfg.db.client })
         }
-        return _knex;
+        return _db;
     },
 
     invalidValueError(detail) {

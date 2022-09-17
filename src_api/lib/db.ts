@@ -3,7 +3,8 @@ import { Database } from 'bun:sqlite';
 
 export default function({connection, client}) {
     if (client !== 'sqlite3') {
-        return knex({connection, client})
+        // return knex({connection, client})
+        return
     }
 
     const db = new Database(connection.filename);
