@@ -1,7 +1,7 @@
 import { listen } from 'svelte/internal';
 import { get as $, writable } from 'svelte/store';
 import { session, redirectData } from './store.js';
-import { redirect } from '@roxi/routify';
+import { goto } from '@roxi/routify';
 import wretch from './wretch.esm.js';
 
 
@@ -82,7 +82,7 @@ export const openAuthForm = _ => {
   if (!$(redirectData).prevUrl)
     redirectData.set({prevUrl: location.pathname});
 
-  return $(redirect)(signInUrl)||'';
+  return $(goto)(signInUrl)||'';
 }
 
 !(function () {
