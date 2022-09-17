@@ -7,7 +7,7 @@
         "build": "vite build",
         "preview": "vite preview",
         "dev": "vite",
-        "postinstall": "node -e 'require(\"./svelte.config.js\").copyConfig()'"
+        "start": "polkadot src_api/app.js"
     },
     "dependencies": {
         "raw-body": "^2.5.1"
