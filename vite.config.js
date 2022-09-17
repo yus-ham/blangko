@@ -1,7 +1,8 @@
 import { svelte } from '@sveltejs/vite-plugin-svelte';
 import { defineConfig } from 'vite';
 import { devServer } from './config.js';
-import restApi from './src_api/index_frontend-dev';
+import routify from '@roxi/routify/vite-plugin';
+import restApi from './src_api';
 
 
 const {PORT, NODE_ENV} = process.env;
@@ -13,16 +14,19 @@ for (let ENV_VAR in globalThis) {
     }
 }
 
-
 export default defineConfig({
     base: globalThis.BASE_URL||'/',
-    server: {...devServer, port: PORT||devServer.port},
     plugins: [
+        routify({
+            routesDir: {default: 'src_front/pages'},
+            devHelper: dev,
+        }),
         svelte(),
         dev && restApi()
     ],
     resolve: {
-        alias: [{find:'~', replacement: __dirname +'/src_front'}]
+        alias: {'~': `${__dirname}/src_front`}
     },
-    build: {emptyOutDir: false}
-});
+
+    server: {...devServer, port: PORT||devServer.port},
+})
