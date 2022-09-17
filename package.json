@@ -1,29 +1,26 @@
 {
-  "name": "@yusham/blangko",
-  "description": "Start business from a blank project",
-  "version": "1.0.0",
-  "scripts": {
-    "dev": "run-p dev:*",
-    "dev:routify": "routify --pages src_front/pages",
-    "dev:vite": "vite",
-    "start": "bun src_api/app.ts",
-    "build": "run-s build:*",
-    "build:routify": "routify -b --pages src_front/pages",
-    "build:vite": "vite build"
-  },
-  "devDependencies": {
-    "@roxi/routify": "^2.18.8",
-    "@sveltejs/vite-plugin-svelte": "^1.0.5",
-    "bun-types": "^0.1.11",
-    "npm-run-all": "^4.1.5",
-    "svelte": "^3.50.1",
-    "svelte-paginate": "^0.0.1",
-    "svelte-preprocess": "^4.10.7",
-    "vite": "^3.1.0"
-  },
-  "dependencies": {
-    "bcryptjs": "^2.4.3",
-    "cookie": "^0.5.0",
-    "jsonwebtoken": "^8.5.1"
-  }
+    "name": "@yusham/blangko",
+    "description": "Start business from a blank project",
+    "version": "1.0.0",
+    "type": "module",
+    "scripts": {
+        "build": "vite build",
+        "preview": "vite preview",
+        "dev": "vite",
+        "start": "bun src_api/app.ts"
+    },
+    "dependencies": {
+        "bcryptjs": "^2.4.3",
+        "cookie": "^0.5.0",
+        "jsonwebtoken": "^8.5.1"
+    },
+    "devDependencies": {
+        "@roxi/routify": "3.0.0-next.119",
+        "@sveltejs/vite-plugin-svelte": "^1.0.5",
+        "bun-types": "^0.1.11",
+        "svelte": "^3.50.1",
+        "svelte-paginate": "^0.0.1",
+        "svelte-preprocess": "^4.10.7",
+        "vite": "^3.1.2"
+    }
 }
