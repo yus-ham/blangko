@@ -1,7 +1,7 @@
-const { serveResource } = require('./app');
+import { serveResource } from './app.js';
 
 
-module.exports = function () {
+export default function () {
   return {
     configureServer: function (vite) {
       vite.middlewares.use('/api', serveResource)
