@@ -33,7 +33,6 @@ class Context {
     }
 }
 
-const  serviceCache = {}
 
 async function serveResource(ctx) {
     if (ctx.parsedUrl.pathname.slice(0, 4) !== globalThis.API_URL) {
@@ -41,43 +40,57 @@ async function serveResource(ctx) {
     }
 
     await parse(ctx)
-    let { Service, allows, resCode, args } = await getActionMeta(ctx)
+    const { service, actionArgs } = await getService(ctx)
 
-    if (!Service) {
+    if (!service) {
         return new Response('', {status: 404})
     }
 
-    const action = Service['onRequest' + ctx.req.method[0] + ctx.req.method.slice(1).toLowerCase()]
+    const action = service['onRequest' + ctx.req.method[0] + ctx.req.method.slice(1).toLowerCase()]
 
     if (!action) {
         return new Response('', {
             status: 405,
-            headers: {'Allow': allows.join(', ')}
+            headers: {Allow: getAllowedMethods(service)}
         })
     }
 
-    for (let key in args) {
-        ctx.parsedUrl.searchParams.set(key, args[key])
+    if (['GET', 'PATCH', 'DELETE'].includes(ctx.req.method) && actionArgs.id) {
+        ctx.parsedUrl.searchParams.set(key, actionArgs.id)
     }
 
     ctx.params = ctx.parsedUrl.searchParams;
     const result = await action(ctx.req, ctx.res)
-    let res = ctx.res();
+    const res = ctx.res();
 
     if (res.status >= 400) {
         res.data = '';
-        resCode = res.status;
     } else {
         res.data = postAction(result)
     }
 
-    return new Response(res.data, {status: resCode, headers: ctx.res.headers})
+    return new Response(res.data, {
+        status: res.status || {POST:201, DELETE:204}[ctx.req.method] || 200,
+        headers: ctx.res.headers
+    })
+}
+
+function getAllowedMethods(service) {
+    if (!service.actions) {
+        service.actions = []
+        for (let _method of ['Get', 'Post', 'Put', 'Patch', 'Delete']) {
+            if (service['onRequest'+_method]) {
+                service.actions.push(_method.toUpperCase())
+            }
+        }
+        service.actions = service.actions.join(', ')
+    }
+    return service.actions
 }
 
 function postAction(result) {
     return JSON.stringify(result)
 }
-
 
 
 const parsers = {
@@ -123,40 +136,28 @@ async function parse(ctx: Context) {
     }
 }
 
-async function getActionMeta(ctx: Context) {
+
+const services = {}
+
+async function getService(ctx) {
     let dir = path.join(__dirname, 'services')
     let route = ctx.parsedUrl.pathname.slice(4)
-    let id, Service = serviceCache[route];
-    let allows;
+    let service = services[route]
+    let actionArgs = {}
 
-    if (!Service) {
-        Service = serviceCache[route] = (await import(dir + route).then(x => x.default).catch(err => void 0))
-
-        if (!Service) {
+    if (!service) {
+        service = services[route] = await import(dir + route).then(x => x.default).catch(err => void 0)
+        if (!service) {
             const slashPos = route.lastIndexOf('/')
-
             if (slashPos > 1) {
-                id = route.slice(slashPos + 1)
+                actionArgs.id = route.slice(slashPos + 1)
                 route = route.slice(0, slashPos)
-                Service = serviceCache[route] = (await import(dir + route)).default;
-            }
-        }
-
-        allows = [];
-        for (let _method of ['Get', 'Post', 'Put', 'Patch', 'Delete']) {
-            if (Service['onRequest'+_method]) {
-                allows.push(_method.toUpperCase())
+                service = services[route] = await import(dir + route).then(x => x.default).catch(err => void 0)
             }
         }
     }
 
-    let resCode = 200;
-
-    if (id && ['GET', 'PATCH', 'DELETE'].includes(ctx.req.method)) ctx.req.params.set('id', id)
-    if (ctx.req.method === 'POST') resCode = 201;
-    else if (ctx.req.method === 'DELETE') resCode = 204;
-
-    return { Service, resCode, allows }
+    return {service, actionArgs}
 }
 
 
@@ -219,7 +220,6 @@ export default {
             serveResource,
             _ => new Response(Bun.file(root + '/index.html'))
         ], ctx)
-
     },
 
     // this is called when fetch() throws or rejects
