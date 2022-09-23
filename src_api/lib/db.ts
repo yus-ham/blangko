@@ -10,7 +10,6 @@ export default function({connection, client}) {
     const db = new Database(connection.filename);
 
     db.raw = function(sql, values=[]) {
-        console.info(`sql:\n`, values.length ? values.reduce((sql, v) => sql.replace('?', typeof v === 'string' ? `'${v.replace(/\'/g,"\\'")}'` : v), sql) : sql, `\nvalues:`, values)
         const stmt = db.query(sql)
         return Promise.resolve(stmt.all.apply(stmt, values))
     }
