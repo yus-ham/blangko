@@ -17,7 +17,7 @@ export default {
     },
 
     onRequestPost(req, res) {
-        req.body.set('client_id', req.cookies.cid)
+        req.body.client_id = req.cookies.cid
         return Session.loginByPassword(req.body)
             .then(data => {
                 res.cookie('rt', data.refresh_token)

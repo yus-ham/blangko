@@ -25,18 +25,18 @@ export default {
 
   async loginByPassword(info) {
     const errors = { password: `Username or password invalid.` }
-    const identity = await User.findByUsername(info.get('username'))
+        const identity = await User.findByUsername(info.username)
 
     if (!identity) {
         return common.invalidValueError(errors)
     }
 
-    const valid = Bcrypt.compareSync(info.get('password'), '$2b$'+ identity.password_hash.slice(4))
+        const valid = Bcrypt.compareSync(info.password, '$2b$'+ identity.password_hash.slice(4))
     if (!valid) {
         return common.invalidValueError(errors)
     }
 
-    info.client_id = info.get('client_id')
+        info.client_id = info.client_id
     info.user_id = identity.id;
     identity.role = identity.name;
     delete identity.password_hash;
