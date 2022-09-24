@@ -3,6 +3,7 @@ globalThis.API_URL = '/api';
 
 
 export default {
+    debug: true,
 
     sessionApi: {
         key: 'ahYtsaKjf5BB7821JnxXw',

@@ -7,7 +7,7 @@ let _db;
 export default {
     db() {
         if (!_db) {
-            _db = db({ connection: cfg.db, client: cfg.db.client })
+            _db = db({ connection: cfg.db, client: cfg.db.client, debug: cfg.debug })
         }
         return _db;
     },
