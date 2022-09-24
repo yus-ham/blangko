@@ -56,10 +56,9 @@ async function serveResource(ctx) {
     }
 
     if (['GET', 'PATCH', 'DELETE'].includes(ctx.req.method) && actionArgs.id) {
-        ctx.parsedUrl.searchParams.set(key, actionArgs.id)
+        ctx.req.params.set('id', actionArgs.id)
     }
 
-    ctx.params = ctx.parsedUrl.searchParams;
     const result = await action(ctx.req, ctx.res)
     const res = ctx.res();
 
