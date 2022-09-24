@@ -17,8 +17,10 @@ export default {
     },
 
     createPager(ctx, total, limit = 10) {
-        ctx.res.headers.set('X-Pagination-Total-Count', total)
-        ctx.res.headers.set('X-Pagination-Per-Page', limit)
+        ctx.res.beforeSend.push(_ => {
+            ctx.res.headers.set('X-Pagination-Total-Count', total)
+            ctx.res.headers.set('X-Pagination-Per-Page', limit)
+        })
 
         const page = +ctx.req.params.page || 1;
         const offset = (page - 1) * limit;

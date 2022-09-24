@@ -14,6 +14,7 @@ class Context {
 
         this.res = () => res;
         this.res.headers = new Headers()
+        this.res.beforeSend = []
         this.res.status = (code) => {
             res.status = code;
             return this.res
@@ -46,9 +47,9 @@ async function serveResource(ctx) {
         return new Response('', {status: 404})
     }
 
-    const action = service['onRequest' + ctx.req.method[0] + ctx.req.method.slice(1).toLowerCase()]
+    const action = 'onRequest' + ctx.req.method[0] + ctx.req.method.slice(1).toLowerCase()
 
-    if (!action) {
+    if (!service[action]) {
         return new Response('', {
             status: 405,
             headers: {Allow: getAllowedMethods(service)}
@@ -59,16 +60,16 @@ async function serveResource(ctx) {
         ctx.req.params.set('id', actionArgs.id)
     }
 
-    const result = await action(ctx.req, ctx.res)
+    ctx.res.data = await service[action](ctx.req, ctx.res)
     const res = ctx.res();
 
     if (res.status >= 400) {
-        res.data = '';
+        ctx.res.data = '';
     } else {
-        res.data = postAction(result)
+        service.afterAction(ctx)
     }
 
-    return new Response(res.data, {
+    return new Response(ctx.res.data, {
         status: res.status || {POST:201, DELETE:204}[ctx.req.method] || 200,
         headers: ctx.res.headers
     })
@@ -85,10 +86,6 @@ function getAllowedMethods(service) {
         service.actions = service.actions.join(', ')
     }
     return service.actions
-}
-
-function postAction(result) {
-    return JSON.stringify(result)
 }
 
 
@@ -145,18 +142,31 @@ async function getService(ctx) {
     let actionArgs = {}
 
     if (!service) {
-        service = services[route] = await import(dir + route).then(x => x.default).catch(err => void 0)
+        service = services[route] = await import(dir + route).then(prepareService).catch(err => void 0)
         if (!service) {
             const slashPos = route.lastIndexOf('/')
             if (slashPos > 1) {
                 actionArgs.id = route.slice(slashPos + 1)
                 route = route.slice(0, slashPos)
-                service = services[route] = await import(dir + route).then(x => x.default).catch(err => void 0)
+                service = services[route] = await import(dir + route).then(prepareService).catch(err => void 0)
             }
         }
     }
 
     return {service, actionArgs}
+}
+
+function prepareService(x) {
+    x.default.afterAction = (ctx) => {
+        ctx.res.beforeSend.forEach(fn => fn())
+        jsonResponse(ctx.res)
+    }
+    return x.default
+}
+
+function jsonResponse(res) {
+    res.headers.set('Content-Type', 'application/json')
+    res.data = JSON.stringify(res.data)
 }
 
 
@@ -199,7 +209,7 @@ function runMiddleware(fns: Function[], ctx: Context) {
                     err.status = 500;
                     err.detail = err.message;
                 } else {
-                    err.detail = postAction(err.detail)
+                    err.detail = afterAction(err.detail)
                 }
                 return new Response(err.detail, err)
             })

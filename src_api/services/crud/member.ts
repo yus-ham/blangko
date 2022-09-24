@@ -10,9 +10,12 @@ export default {
         }
 
         const total = await Model.findTotalCount()
-        let paging = common.createPager({req, res}, total)
+        if (!total) {
+            return []
+        }
 
-        return total ? Model.findAll(paging.limit, paging.offset) : [];
+        const paging = common.createPager({req, res}, total)
+        return Model.findAll(paging.limit, paging.offset)
     },
 
     async onRequestPost(req) {
