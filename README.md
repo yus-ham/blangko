@@ -23,5 +23,5 @@ bun run start
 
 ### Development
 ```
-pnpm dev
+bun run dev
 ```
