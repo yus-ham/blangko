@@ -1,4 +1,3 @@
-import Bun from 'bun';
 import path from 'path';
 import fs from 'fs';
 import cookie from 'cookie';
@@ -35,7 +34,7 @@ class Context {
 }
 
 
-async function serveResource(ctx) {
+export async function serveResource(ctx) {
     if (ctx.parsedUrl.pathname.slice(0, 4) !== globalThis.API_URL) {
         return;
     }
@@ -88,47 +87,12 @@ function getAllowedMethods(service) {
     return service.actions
 }
 
-
-const parsers = {
-    'application/json': req => req.text().then(json  => JSON.parse(json || "null")),
-    'application/x-www-form-urlencoded': req => req.text().then(parseQs),
-    'multipart/form-data': parseFormData,
-}
-
-function parseQs(qs) {
-    const result = {};
-    (new URLSearchParams(qs)).forEach((value, key) => {
-        result[key] = value
-    })
-    return result
-}
-
-async function parseFormData(req) {
-    const reader = await req.blob().then(blob => blob.stream().getReader())
-    return new Promise((resolve) => {
-        let data = '';
-
-        const processChunk = ({done, chunk}) => {
-            if (done) {
-                return resolve(new URLSearchParams(data))
-            }
-            data += (new TextDecoder).decode(chunk)
-            reader.read().then(processChunk)
-        }
-
-        reader.read().then(processChunk)
-    })
-}
-
 async function parse(ctx: Context) {
     ctx.req.cookies = cookie.parse(ctx.req.headers.get('cookie') || '')
     ctx.req.params = ctx.parsedUrl.searchParams
 
     if (['POST', 'PATCH', 'PUT'].includes(ctx.req.method)) {
-        return new Promise(async(resolve) => {
-            ctx.req.body = await parsers[ctx.req.headers.get('content-type')](ctx.req)
-            resolve()
-        })
+        ctx.req.bodyParsed = await ctx.req.formData().then(d => d.toJSON())
     }
 }
 
@@ -170,7 +134,7 @@ function jsonResponse(res) {
 }
 
 
-const root = path.join(__dirname, '/../dist')
+const root = path.join(__dirname, '/../dist/client')
 
 function serveStatic(ctx: Context) {
     const file = root + ctx.parsedUrl.pathname;
@@ -209,7 +173,7 @@ function runMiddleware(fns: Function[], ctx: Context) {
                     err.status = 500;
                     err.detail = err.message;
                 } else {
-                    err.detail = afterAction(err.detail)
+                    // err.detail = afterAction(err.detail)
                 }
                 return new Response(err.detail, err)
             })
@@ -238,7 +202,7 @@ export default {
 
     // this boolean enables the bun's default error handler
     // sometime after the initial release, it will auto reload as well
-    development: process.env.NODE_ENV !== "production",
+    development: process.env.BUN_ENV !== "production",
     // note: this isn't node, but for compatibility bun supports process.env + more stuff in process
 
     // SSL is enabled if these two are set

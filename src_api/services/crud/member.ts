@@ -19,11 +19,11 @@ export default {
     },
 
     async onRequestPost(req) {
-        return Model.insert(req.body)
+        return Model.insert(req.bodyParsed)
     },
 
     async onRequestPatch(req, res) {
-        return await Model.update(req.params.get('id'), req.body) || res.status(404)
+        return await Model.update(req.params.get('id'), req.bodyParsed) || res.status(404)
     },
 
     async onRequestDelete(req) {

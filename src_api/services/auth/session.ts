@@ -16,9 +16,12 @@ export default {
         return session
     },
 
-    onRequestPost(req, res) {
-        req.body.client_id = req.cookies.cid
-        return Session.loginByPassword(req.body)
+    async onRequestPost(req, res) {
+        const info = new Proxy({client_id: req.cookies.cid}, {
+            get: (target, p) => target[p]||req.bodyParsed[p]
+        })
+
+        return Session.loginByPassword(info)
             .then(data => {
                 res.cookie('rt', data.refresh_token)
                 return data
