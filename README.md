@@ -11,9 +11,9 @@ Clone and select a branch as of your preferd backend.
 git clone https://github.com/yus-ham/blangko.git --depth 1 --single-branch -b api-bun-serve <PROJECT_NAME>
 cd <PROJECT_NAME>
 
-pnpm install
-pnpm build
-pnpm start
+bun install
+bun run build
+bun run start
 ```
 
 
