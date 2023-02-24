@@ -3,5 +3,6 @@
 .DS_Store
 .routify
 .env
-database/blangko.sqlite
 dist
+database/*
+!database/blangko-init.sqlite
