@@ -38,7 +38,6 @@ export default function (_ = {}) {
         },
 
         postSave: (id, data) => {
-            console.info(id, data)
             data.id = id
             return data
         },

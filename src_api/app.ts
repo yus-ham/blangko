@@ -1,8 +1,11 @@
 import path from 'path';
 import fs from 'fs';
 import cookie from 'cookie';
-import '../config.ts';
 
+
+const dev = process.env.BUN_ENV !== 'production';
+globalThis.BASE_URL = process.env.BASE_URL||'/';
+globalThis.API_URL = process.env.BASE_URL||'/api';
 
 class Context {
     constructor(req: Request) {
@@ -106,13 +109,13 @@ async function getService(ctx) {
     let actionArgs = {}
 
     if (!service) {
-        service = services[route] = await import(dir + route).then(prepareService).catch(err => void 0)
+        service = services[route] = await import(dir + route +'.ts').then(prepareService).catch(console.error)
         if (!service) {
             const slashPos = route.lastIndexOf('/')
             if (slashPos > 1) {
                 actionArgs.id = route.slice(slashPos + 1)
                 route = route.slice(0, slashPos)
-                service = services[route] = await import(dir + route).then(prepareService).catch(err => void 0)
+                service = services[route] = await import(dir + route).then(prepareService).catch(console.error)
             }
         }
     }
@@ -181,7 +184,10 @@ function runMiddleware(fns: Function[], ctx: Context) {
 }
 
 
-console.log('Server running on localhost:3000');
+const hostname = process.env.SERVER_HOST;
+const port = process.env.SERVER_PORT;
+
+console.log(`Server running on ${hostname}:${port}`);
 
 export default {
     fetch(req: Request) {
@@ -202,13 +208,13 @@ export default {
 
     // this boolean enables the bun's default error handler
     // sometime after the initial release, it will auto reload as well
-    development: process.env.BUN_ENV !== "production",
+    development: dev,
     // note: this isn't node, but for compatibility bun supports process.env + more stuff in process
 
     // SSL is enabled if these two are set
     // certFile: './cert.pem',
     // keyFile: './key.pem',
 
-    port: 3000, // number or string
-    hostname: "localhost", // defaults to 0.0.0.0
+    port, // number or string
+    hostname, // defaults to 0.0.0.0
 }

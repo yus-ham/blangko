@@ -1,10 +1,13 @@
 import common from '../lib/common.ts';
-import config from '../../config.ts';
 import Bcrypt from 'bcryptjs';
 import Jwt from 'jsonwebtoken';
 import RefreshToken from './refresh-token.ts';
 import User from './user.ts';
 
+
+const config = {
+    jwtKey: process.env.JWT_KEY
+}
 
 export default {
     async loginByToken(rt = null) {
