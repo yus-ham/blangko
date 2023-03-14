@@ -1,4 +1,5 @@
-import dataMember from './data.json';
+import dataMember from './data.json' assert {type: 'json'}
+
 
 const identity = {
     username: 'admin',
@@ -110,10 +111,10 @@ const services = {
 }
 
 
-export default function (req, res) {
+export default function (req, res, opts = {}) {
     return [
         next => serveResource(req, res, next),
-        next => serveStatic(req, res, next),
+        next => serveStatic(req, res, {root: opts.public_dir}),
     ]
     .reduce((fn, next) => fn(next))
 }
@@ -150,24 +151,21 @@ export async function serveResource(req, res, next) {
 
 
 import sendStream from 'send';
-import { resolve } from 'path';
 
-const root = resolve(__dirname + '/../dist')
-
-function serveStatic(req, res) {
+function serveStatic(req, res, opts = {}) {
     if (req.method !== 'GET' && req.method !== 'HEAD') {
         res.setHeader('Allow', 'GET, HEAD')
         return send(res, 405)
     }
 
     return new Promise(resolve => {
-        let stream = sendStream(req, req._parsedUrl.pathname, { root })
+        let stream = sendStream(req, req._parsedUrl.pathname, opts)
 
         stream.on('error', err => {
             if (err.status === 404) {
                 let dir = err.path.slice(0, err.path.lastIndexOf('/'))
-                if (dir !== root) {
-                    return stream.sendIndex(root)
+                if (dir !== opts.root) {
+                    return stream.sendIndex(opts.root)
                 }
             }
 
