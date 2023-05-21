@@ -1,5 +1,4 @@
-import Session from '../../models/session.ts';
-import Bcrypt from 'bcryptjs';
+import Session from '../../models/session.js';
 
 
 export default {
@@ -7,17 +6,14 @@ export default {
     async onRequestGet(req, res) {
         const session = await Session.loginByToken(req.cookies.rt)
         if (!session) {
-            if (!req.cookies.cid) {
-                const cid = Buffer.from(Bcrypt.genSaltSync()).toString('base64').slice(0,20)
-                res.cookie('cid', cid)
-            }
+            req.clientID || req.generateCID()
             return res.status(401)
         }
         return session
     },
 
     async onRequestPost(req, res) {
-        const info = new Proxy({client_id: req.cookies.cid}, {
+        const info = new Proxy({client_id: req.clientID}, {
             get: (target, p) => target[p]||req.bodyParsed[p]
         })
 

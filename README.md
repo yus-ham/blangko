@@ -12,7 +12,7 @@ git clone https://github.com/yus-ham/blangko.git --depth 1 --single-branch -b ap
 cd <PROJECT_NAME>
 
 cp .env.sample .env
-cp database/blangko-init.sqlite database/blangko.sqlite
+bunx knex --knexfile ./src_api/knexfile.cjs migrate:latest 
 
 bun install
 bun run build

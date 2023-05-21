@@ -1,26 +1,28 @@
 {
-    "name": "@yusham/blangko",
-    "description": "Start business from a blank project",
-    "version": "1.0.0",
-    "type": "module",
-    "scripts": {
-        "build": "vite build",
-        "preview": "vite preview",
-        "dev": "vite",
-        "start": "bun src_api/app.ts"
-    },
-    "dependencies": {
-        "bcryptjs": "^2.4.3",
-        "cookie": "^0.5.0",
-        "jsonwebtoken": "^8.5.1"
-    },
-    "devDependencies": {
-        "@roxi/routify": "3.0.0-next.119",
-        "@sveltejs/vite-plugin-svelte": "^1.0.5",
-        "bun-types": "^0.1.11",
-        "svelte": "^3.50.1",
-        "svelte-paginate": "^0.0.1",
-        "svelte-preprocess": "^4.10.7",
-        "vite": "^3.1.2"
-    }
+  "name": "@yusham/blangko",
+  "description": "Start business from a blank project",
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "build": "vite build",
+    "preview": "vite preview",
+    "dev": "vite",
+    "start": "BUN_ENV=production bun src_api/app.js"
+  },
+  "dependencies": {
+    "bcryptjs": "^2.4.3",
+    "cookie": "^0.5.0",
+    "jsonwebtoken": "^8.5.1",
+    "knex": "^2.4.2",
+    "mysql2": "^3.3.1"
+  },
+  "devDependencies": {
+    "@roxi/routify": "3.0.0-next.119",
+    "@sveltejs/vite-plugin-svelte": "^1.0.5",
+    "bun-types": "^0.1.11",
+    "svelte": "^3.50.1",
+    "svelte-paginate": "^0.0.1",
+    "svelte-preprocess": "^4.10.7",
+    "vite": "^3.1.2"
+  }
 }

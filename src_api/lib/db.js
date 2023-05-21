@@ -1,6 +1,6 @@
 import path from 'path';
-import { Database } from 'bun:sqlite';
-// import knex from 'knex'; 
+// import { Database } from 'bun:sqlite';
+import knex from 'knex'; 
 
 const config = {
     connection: {
@@ -16,8 +16,11 @@ const config = {
 
 export default function() {
     if (config.client !== 'sqlite3') {
-        // return knex(config)
-        return
+        const db = knex(config)
+        return {
+            query: (sql, args) => db.raw(sql, args).then(r => r[0]),
+            execute: (sql, args) => db.raw(sql, args),
+        }
     }
 
     const db = new Database(path.join(__dirname, '/../../', process.env.DB_DATABASE));

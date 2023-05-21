@@ -1,14 +1,15 @@
 import path from 'path';
 import fs from 'fs';
 import cookie from 'cookie';
+import Bcrypt from 'bcryptjs';
 
 
 const dev = process.env.BUN_ENV !== 'production';
 globalThis.BASE_URL = process.env.BASE_URL||'/';
 globalThis.API_URL = process.env.BASE_URL||'/api';
 
-class Context {
-    constructor(req: Request) {
+export class Context {
+    constructor(req) {
         this.req = req;
         this.parsedUrl = new URL(req.url)
 
@@ -17,13 +18,15 @@ class Context {
         this.res = () => res;
         this.res.headers = new Headers()
         this.res.beforeSend = []
+
         this.res.status = (code) => {
             res.status = code;
             return this.res
         }
-        this.res.cookie = (key: string, value = '', opts = {}) => {
+
+        this.res.cookie = (key, value = '', opts = {}) => {
             let cookieStr;
-            opts.path = globalThis.API_URL;
+            opts.path = API_URL;
             if (!value) {
                 cookieStr = `${key}=; Path=${opts.path}; MaxAge=0; HttpOnly`;
             } else {
@@ -38,7 +41,9 @@ class Context {
 
 
 export async function serveResource(ctx) {
-    if (ctx.parsedUrl.pathname.slice(0, 4) !== globalThis.API_URL) {
+    dev && console.info({ctx})
+
+    if (ctx.parsedUrl.pathname.slice(0, API_URL.length) !== API_URL) {
         return;
     }
 
@@ -63,7 +68,8 @@ export async function serveResource(ctx) {
     }
 
     ctx.res.data = await service[action](ctx.req, ctx.res)
-    const res = ctx.res();
+
+    const res = ctx.res()
 
     if (res.status >= 400) {
         ctx.res.data = '';
@@ -90,9 +96,15 @@ function getAllowedMethods(service) {
     return service.actions
 }
 
-async function parse(ctx: Context) {
-    ctx.req.cookies = cookie.parse(ctx.req.headers.get('cookie') || '')
+async function parse(ctx) {
+    ctx.req.cookies = cookie.parse(ctx.req.headers.get('cookie') ||'')
     ctx.req.params = ctx.parsedUrl.searchParams
+
+    //@TODO: use client IP address for client_id, but not supported by Web API
+    if (!ctx.req.clientID) {
+        ctx.req.clientID = ctx.req.cookies.cid
+        ctx.req.generateCID = _ => ctx.res.cookie('cid', Buffer.from(Bcrypt.genSaltSync()).toString('base64').slice(0, 20))
+    }
 
     if (['POST', 'PATCH', 'PUT'].includes(ctx.req.method)) {
         ctx.req.bodyParsed = await ctx.req.formData().then(d => d.toJSON())
@@ -103,19 +115,21 @@ async function parse(ctx: Context) {
 const services = {}
 
 async function getService(ctx) {
-    let dir = path.join(__dirname, 'services')
-    let route = ctx.parsedUrl.pathname.slice(4)
+    let route = ctx.parsedUrl.pathname.slice(API_URL.length)
     let service = services[route]
-    let actionArgs = {}
+    const dir = path.join(__dirname, 'services')
+    const actionArgs = {}
+
+    dev && console.info({dir, route, service})
 
     if (!service) {
-        service = services[route] = await import(dir + route +'.ts').then(prepareService).catch(console.error)
+        service = services[route] = await import(`${dir}${route}.js`).then(prepareService).catch(_ => void 0)
         if (!service) {
             const slashPos = route.lastIndexOf('/')
             if (slashPos > 1) {
                 actionArgs.id = route.slice(slashPos + 1)
                 route = route.slice(0, slashPos)
-                service = services[route] = await import(dir + route).then(prepareService).catch(console.error)
+                service = services[route] = await import(`${dir}${route}.js`).then(prepareService).catch(_ => void 0)
             }
         }
     }
@@ -139,7 +153,7 @@ function jsonResponse(res) {
 
 const root = path.join(__dirname, '/../dist/client')
 
-function serveStatic(ctx: Context) {
+function serveStatic(ctx) {
     const file = root + ctx.parsedUrl.pathname;
 
     try {
@@ -151,7 +165,7 @@ function serveStatic(ctx: Context) {
     }
 }
 
-function runMiddleware(fns: Function[], ctx: Context) {
+function runMiddleware(fns, ctx) {
     if (!fns.length) {
         return;
     }
@@ -184,13 +198,12 @@ function runMiddleware(fns: Function[], ctx: Context) {
 }
 
 
-const hostname = process.env.SERVER_HOST;
-const port = process.env.SERVER_PORT;
+const {SERVER_HOST: hostname, SERVER_PORT: port} = process.env;
 
-console.log(`Server running on ${hostname}:${port}`);
+dev || console.log(`Server running on ${hostname}:${port}`);
 
 export default {
-    fetch(req: Request) {
+    fetch(req) {
         console.info('FetchEvent:',req.url)
         const ctx = new Context(req)
 

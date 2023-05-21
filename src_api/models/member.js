@@ -1,4 +1,4 @@
-import activeRecord from '../lib/active-record.ts';
+import activeRecord from '../lib/active-record.js';
 
 
 export default {

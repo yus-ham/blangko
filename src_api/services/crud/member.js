@@ -1,5 +1,5 @@
-import common from '../../lib/common.ts';
-import Model from '../../models/member.ts';
+import common from '../../lib/common.js';
+import Model from '../../models/member.js';
 
 
 export default {
