@@ -5,6 +5,7 @@
 
     globalThis.BASE_URL = "$_GLOBAL_BASE_URL";
     globalThis.API_URL = "$_GLOBAL_API_URL";
+    globalThis.SESS_API_URL = "$_GLOBAL_SESS_API_URL";
 </script>
 
 <svelte:head>
