@@ -1,6 +1,6 @@
 <script>
     import { url } from '@roxi/routify';
-    import GridView from '~/widgets/GridView.svelte';
+    import GridView from '~/widgets/grid/GridView.svelte';
 
 
     let grid;
