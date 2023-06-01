@@ -14,6 +14,8 @@ for (let ENV_VAR in globalThis) {
     }
 }
 
+globalThis.SESS_API_URL || (globalThis.SESS_API_URL = (dev ? '/api' : globalThis.API_URL) + '/auth/session')
+
 export default defineConfig({
     base: globalThis.BASE_URL||'/',
     plugins: [
