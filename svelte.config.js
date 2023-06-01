@@ -1,11 +1,12 @@
+import preProcess from 'svelte-preprocess';
+
+
 const globals = [...'onReady,elems,elem,createElem,show,hide,trigger,listen,wretch,api,signInUrl'.split(','), ...Object.keys(globalThis)];
 
 
-module.exports = {
-    disableDependencyReinclusion: ['@roxi/routify'],
-
+export default {
     preprocess: [
-        require('svelte-preprocess')({
+        preProcess({
             replace: [
                 [/{#else if /gim, '{:else if '],
                 [/{#elseif /gim, '{:else if '],
@@ -16,13 +17,15 @@ module.exports = {
                 [/{#catch /gim, '{:catch '],
                 [/{#endawait}/gim, '{/await}'],
                 [/{#endkey}/gim, '{/key}'],
-                [/{#renderby /gim, '{#key '],
-                [/{#endrenderby}/gim, '{/key}'],
+                [/{#depend /gim, '{#key '],
+                [/{#enddepend}/gim, '{/key}'],
+                [/{#endepend}/gim, '{/key}'],
                 [/{#debug /gim, '{@debug '],
                 [/{#html /gim, '{@html '],
 
                 ['$_GLOBAL_BASE_URL', String(globalThis.BASE_URL||'').replace(/\/+$/, '')],
-                ['$_GLOBAL_API_URL', globalThis.API_URL||'/api'],
+                ['$_GLOBAL_API_URL', globalThis.API_URL],
+                ['$_GLOBAL_SESS_API_URL', globalThis.SESS_API_URL],
             ]
         }),
     ],
@@ -30,15 +33,6 @@ module.exports = {
     onwarn(warn, next) {
         // skip warnings
         if (warn.code === 'missing-declaration' && globals.includes(warn.message.split("'")[1]));
-        else if (warn.message.includes("A11y: "));
         else next(warn)
     },
-
-    copyConfig() {
-        let fs = require('fs')
-        if (!fs.existsSync('./config.js')) {
-            let cfg = fs.readFileSync('./config.js-example', 'utf8')
-            fs.writeFileSync('./config.js', cfg, {encoding: 'utf8'})
-        }
-    }
-};
+}

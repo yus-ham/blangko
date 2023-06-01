@@ -1,66 +1,72 @@
 <script>
-  import { onMount } from 'svelte';
-  import createForm from '~/utils/form.js';
+    import { createEventDispatcher, onMount } from "svelte";
+    import createForm from "~/utils/form.js";
 
+    export let method, action;
 
-  const formId = 'form';
-  const {submitting, initialize} = createForm(formId, {
-    success: _ => alert(`Data saved`),
-  });
+    const formId = "form";
 
-  onMount(async _ => {
-    initialize($$props.model);
-  });
+    const dispatch = createEventDispatcher()
+
+    const { submitting, initialize } = createForm(formId, {
+        method, action,
+        success(model) {
+            dispatch('success', model)
+            alert(`Data saved`)
+        },
+    })
+
+    onMount(_ => {
+        initialize($$props.model)
+        dispatch('init', $$props.model)
+    })
 </script>
 
 <div>
-  <div>
-    <h1>{$$props.title}</h1>
-  </div>
-  <div>
+    <div>
+        <h1>{$$props.title}</h1>
+    </div>
+    <div>
+        <form id={formId}>
+            <div>
+                <label>Name</label>
+                <div>
+                    <input name="name" />
+                    <div />
+                </div>
+            </div>
 
-    <form id="{formId}" method="{$$props.method}" action="{$$props.action}">
+            <div>
+                <label>Email</label>
+                <div>
+                    <input name="email" />
+                    <div />
+                </div>
+            </div>
 
-      <div>
-        <label>Name</label>
-        <div>
-          <input name="name"/>
-          <div/>
-        </div>
-      </div>
+            <div>
+                <label>Phone</label>
+                <div>
+                    <input name="phone" maxlength="12" />
+                    <div />
+                </div>
+            </div>
 
-      <div>
-        <label>Email</label>
-        <div>
-          <input name="email"/>
-          <div/>
-        </div>
-      </div>
+            <div>
+                <label>Birth Date</label>
+                <div>
+                    <input name="dob" type="date" />
+                    <div />
+                </div>
+            </div>
 
-      <div>
-        <label>Phone</label>
-        <div>
-          <input name="phone" maxlength="12"/>
-          <div/>
-        </div>
-      </div>
+            <div>
+                <div>
+                    <button type="submit" aria-busy={$submitting}>Save</button>
+                </div>
+            </div>
 
-      <div>
-        <label>Birth Date</label>
-        <div>
-          <input name="dob" type="date" />
-          <div/>
-        </div>
-      </div>
-
-      <div>
-        <div>
-          <button type="submit" aria-busy="{$submitting}">Save</button>
-        </div>
-      </div>
-
-      <slot name="bottom"/>
-    </form>
-
-  </div>
+            <slot name="bottom" />
+        </form>
+    </div>
 </div>
