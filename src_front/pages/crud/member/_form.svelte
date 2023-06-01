@@ -2,14 +2,21 @@
     import { onMount } from "svelte";
     import createForm from "~/utils/form.js";
 
+    export let method, action;
+
     const formId = "form";
     const { submitting, initialize } = createForm(formId, {
-        success: _ => alert(`Data saved`),
-    });
+        method,
+        action,
+        success(model) {
+            dispatch('success', model)
+            alert(`Data saved`)
+        },
+    })
 
-    onMount(async _ => {
-        initialize($$props.model);
-    });
+    onMount(_ => {
+        initialize($$props.model)
+    })
 </script>
 
 <div>
@@ -17,7 +24,7 @@
         <h1>{$$props.title}</h1>
     </div>
     <div>
-        <form id={formId} method={$$props.method} action={$$props.action}>
+        <form id={formId}>
             <div>
                 <label>Name</label>
                 <div>
