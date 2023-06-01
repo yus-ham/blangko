@@ -12,6 +12,8 @@ globalThis.BASE_URL = process.env.BASE_URL||'/';
 globalThis.API_URL = process.env.BASE_URL||'/api';
 
 
+globalThis.SESS_API_URL || (globalThis.SESS_API_URL = (dev ? '/api' : globalThis.API_URL) + '/auth/session')
+
 export default defineConfig({
     base: BASE_URL||'/',
     plugins: [

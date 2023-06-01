@@ -1,54 +1,46 @@
 <script>
-  import { goto } from '@roxi/routify';
-  import { session, redirectData } from '~/utils/store.js';
-
-  const logout = e => {
-    wretchAuth('/api/auth/session').delete().res(_ => {
-      $redirectData.prevUrl = undefined;
-      $session = undefined;
-      $goto('/auth/session/sign-in')
-    })
-  }
+    import { goto, url } from '@roxi/routify';
+    import { logout } from '~/utils/common.js';
 </script>
 
 <!-- https://codepen.io/StephenScaff/pen/bVbEbJ -->
 <input type="checkbox" id="check">
 <label for="check"><i class="ion-navicon-round"></i></label>
 
-<aside class=sidebar>
-  <header>
-    <h2>Blangko</h2>
-  </header>
+<aside class="sidebar">
+    <header>
+        <h2>Blangko</h2>
+    </header>
 
-  <nav>
-    <ul>
-      <li>
-        <a href="/"><i class="ion-stats-bars"></i> <span>Dashboard</span></a>
-      </li>
-      <li class="has-submenu">
-        <a href="#"><i class="ion-bag"></i> <span>CRUD Example</span></a>
-        <ul class="nav-flyout">
-          <li>
-            <a href="/crud/member"><i class="ion-stats-bars"></i> <span>Data Member</span></a>
-          </li>
+    <nav>
+        <ul>
+            <li>
+                <a href="/"><i class="ion-stats-bars"></i> <span>Dashboard</span></a>
+            </li>
+            <li class="has-submenu">
+                <a href="#"><i class="ion-bag"></i> <span>CRUD Example</span></a>
+                <ul class="nav-flyout">
+                    <li>
+                        <a href={$url('/crud/member')}><i class="ion-stats-bars"></i> <span>Data Member</span></a>
+                    </li>
+                </ul>
+            </li>
+            <li class="has-submenu">
+                <a href="#"><i class="ion-bag"></i> <span>Pages</span></a>
+                <ul class="nav-flyout">
+                    <li>
+                        <a href={$url('/about')}><i class="ion-clipboard"></i>About</a>
+                    </li>
+                    <li>
+                        <a href={$url('/contact')}><i class="ion-email"></i>Contact</a>
+                    </li>
+                </ul>
+            </li>
+            <li>
+                <a href="#logout" on:click={_ => logout().then(_ => $goto(signInUrl))}><i class="ion-log-out"></i> <span class="">Logout</span></a>
+            </li>
         </ul>
-      </li>
-      <li class="has-submenu">
-        <a href="#"><i class="ion-bag"></i> <span>Pages</span></a>
-        <ul class="nav-flyout">
-          <li>
-            <a href="/about"><i class="ion-clipboard"></i>About</a>
-          </li>
-          <li>
-            <a href="/contact"><i class="ion-email"></i>Contact</a>
-          </li>
-        </ul>
-      </li>
-      <li>
-        <a href="#logout" on:click="{logout}"><i class="ion-log-out"></i> <span class="">Logout</span></a>
-      </li>
-    </ul>
-  </nav>
+    </nav>
 </aside>
 
 <style global>
