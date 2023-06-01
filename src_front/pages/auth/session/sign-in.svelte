@@ -7,12 +7,13 @@
 
     const formId = 'form-login';
     const { initialize, submitting } = createForm(formId, {
-        action: api('auth/session'),
+        action: SESS_API_URL,
         credentials: 'omit',
         errorClass: ['text-danger'],
         errorsMap: {password: ['.hint']},
 
         success(data) {
+            data.expired_at = Date.now() + (data.duration * 1000)
             $session = data;
             $goto($redirectData.prevUrl || '/')
         },

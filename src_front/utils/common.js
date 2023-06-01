@@ -10,9 +10,7 @@ export const urlRewrite = {
     toInternal: u => u === BASE_URL ? '/' : u.substr(BASE_URL.length),
 }
 
-const wretchAuth = u => wretch(u).headers({ Authorization: 'Bearer ' + $(session).token });
-
-const parseHeaders = res => {
+function parseHeaders(res) {
     res.body.type = String(res.headers.get('Content-Type'));
     res.body.length = +res.headers.get('Content-Length');
     setPaging(res, 1)
@@ -27,9 +25,9 @@ function setPaging(res, page = 1) {
     res.paging = { page, perPage, totalData, offset, to };
 }
 
-JSON.fetch = (w, d = {}) => {
-    d = { data: d };
-    const resolver = _w => _w
+JSON.fetch = function(req, d = {}) {
+    d = { data: d }
+    const resolver = _req => _req
         .unauthorized(err => err)
         .res(async _res => {
             if (!_res) {
@@ -40,8 +38,27 @@ JSON.fetch = (w, d = {}) => {
             return _res;
         })
 
-    return w.resolve(resolver).get();
+    return Promise.resolve(req).then(_req => _req.resolve(resolver).get())
 }
+
+export async function getSession() {
+    const sess = $(session)
+    
+    if (sess && Date.now() < $(session).expired_at)
+        return sess;
+
+    const res = await JSON.fetch(wretch(SESS_API_URL))
+
+    if (res.data) {
+        res.data.expired_at = Date.now() + (res.data.duration * 1000)
+        session.set(res.data)
+        return res.data
+    }
+
+    return res
+}
+
+const wretchAuth = u => getSession().then(sess => wretch(u).auth(`Bearer ${sess.token}`))
 
 const api = u => API_URL + '/' + (u ? String(u).replace(/^\/+/, '') : '');
 api.fetch = (u, d) => JSON.fetch(wretchAuth(api(u)), d);
@@ -73,9 +90,7 @@ api.list = url => {
     return respon;
 }
 
-export const getSession = _ => $(session) || JSON.fetch(wretch(api('auth/session'), { credentials: 'include', mode: 'cors' })).then(x => x.data ? session.set(x.data) || x.data : x);
-
-export const authenticate = res => {
+export function authenticate(res) {
     if (res.status === 401) {
         session.set(undefined)
         return openAuthForm()
@@ -83,12 +98,20 @@ export const authenticate = res => {
     session.set(res.data)
 }
 
-export const openAuthForm = _ => {
+export function openAuthForm() {
     if (!$(redirectData).prevUrl)
-        redirectData.set({ prevUrl: location.pathname });
+        redirectData.set({ prevUrl: location.pathname.slice(BASE_URL.length) })
 
     return $(goto)(signInUrl) || '';
 }
+
+export function logout() {
+    return wretch(SESS_API_URL).delete().res(_ => {
+        redirectData.set({ prevUrl: undefined })
+        session.set(undefined)
+    })
+}
+
 
 !(function () {
     // globals
