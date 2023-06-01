@@ -11,18 +11,18 @@ export const urlRewrite = {
 }
 
 function parseHeaders(res) {
-    res.body.type = String(res.headers.get('Content-Type'));
-    res.body.length = +res.headers.get('Content-Length');
+    res.body.type = String(res.headers.get('Content-Type'))
+    res.body.length = +res.headers.get('Content-Length')
     setPaging(res, 1)
 }
 
 function setPaging(res, page = 1) {
-    const perPage = +res.headers.get('X-Pagination-Per-Page');
-    const totalData = +res.headers.get('X-Pagination-Total-Count');
+    const perPage = +res.headers.get('X-Pagination-Per-Page')
+    const totalData = +res.headers.get('X-Pagination-Total-Count')
     const offset = (page - 1) * perPage + 1;
-    const to = Math.min(totalData, offset + perPage - 1);
+    const to = Math.min(totalData, offset + perPage - 1)
 
-    res.paging = { page, perPage, totalData, offset, to };
+    res.paging = { page, perPage, totalData, offset, to }
 }
 
 JSON.fetch = function(req, d = {}) {
@@ -55,37 +55,35 @@ export async function getSession() {
         return res.data
     }
 
-    return res
+    return res;
 }
 
 const wretchAuth = u => getSession().then(sess => wretch(u).auth(`Bearer ${sess.token}`))
 
-const api = u => API_URL + '/' + (u ? String(u).replace(/^\/+/, '') : '');
-api.fetch = (u, d) => JSON.fetch(wretchAuth(api(u)), d);
-api.data = (u, d) => api.fetch(u, d).then(res => res.data);
+const api = u => API_URL + '/' + (u ? String(u).replace(/^\/+/, '') : '')
+api.fetch = (u, d) => JSON.fetch(wretchAuth(api(u)), d)
+api.data = (u, d) => api.fetch(u, d).then(res => res.data)
 
-api.list = url => {
+api.list = function(url) {
     const respon = writable({
         loading: true,
         paging: {},
         data: [],
     });
 
-    function load(page) {
+    const setRespon = res => respon.set({ ...res, load, loading: false })
+
+    function load(page, qp = '') {
         respon.set({ ...$(respon), loading: true })
         if (!page) page = this.paging.page;
-        const _url = url + (`${url}`.includes('?') ? '&' : '?') + 'page=' + page;
+        const _url = url + (`${url}`.includes('?') ? '&' : '?') + 'page=' + page +'&'+ qp;
         api.fetch(_url).then(res => {
             setPaging(res, page)
             setRespon(res)
         })
     }
 
-    function setRespon(res) {
-        respon.set({ ...res, load, loading: false });
-    }
-
-    api.fetch(url).then(setRespon);
+    api.fetch(url).then(setRespon)
 
     return respon;
 }
