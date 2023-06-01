@@ -4,14 +4,14 @@
 
 
     let grid;
-    let resource = '/crud/member';
+    let route = '/crud/member';
 </script>
 
 <section>
     <h1>Data Member</h1>
 
-    <GridView bind:this={grid} api-url={resource}>
-        <div slot="buttons"><a href="{$url(resource)}/new">Tambah</a></div>
+    <GridView bind:this={grid} api-url={route}>
+        <div slot="buttons"><a href="{$url(route)}/new">Tambah</a></div>
 
         <tr slot="columns">
             <th>#</th>
@@ -39,7 +39,7 @@
             <td>{row.phone}</td>
             <td>{new Date(row.dob).toString().slice(4, 15)}</td>
             <td>
-                <a title="Edit" href="{$url(resource)}/{row.id}/edit"><small>[E]</small></a>
+                <a title="Edit" href="{$url(route)}/{row.id}/edit"><small>[E]</small></a>
                 <a title="Delete" data-id="{row.id}" data-method="delete" data-confirm="Are you sure you want to delete this member: `{row.name}`?"><small>[D]</small></a>
             </td>
         </tr>
