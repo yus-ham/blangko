@@ -20,7 +20,12 @@ const services = {
             }
 
             const perPage = 5;
-            const totalPages = Math.ceil(dataMember.length / perPage)
+            const totalPages = Math.ceil(dataMember.length / perPage);
+
+            ['name','email','phone'].forEach(key => {
+                this.params[key] && (data = data.filter(x => x[key].toLowerCase().includes(this.params[key].toLowerCase())))
+            })
+
             if (!this.params.page || this.params.page < 2) {
                 data = data.slice(0, perPage)
             }
