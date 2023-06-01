@@ -1,4 +1,5 @@
 <script>
+    import { urlRewrite } from './utils/common.js';
     import { Router } from '@roxi/routify';
     import routes from '~/../.routify/routes.default.js';
 
@@ -11,4 +12,4 @@
     <link rel="stylesheet" href="{BASE_URL}/css/pico.min.css"/>
 </svelte:head>
 
-<Router {routes} />
+<Router {routes} {urlRewrite} />

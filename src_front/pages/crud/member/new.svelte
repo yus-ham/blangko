@@ -1,5 +1,5 @@
 <script>
-    import { goto } from "@roxi/routify";
+    import { goto, url } from "@roxi/routify";
     import { redirectData } from "~/utils/store";
     import Form from "./_form.svelte";
 
@@ -18,6 +18,6 @@
 
 <Form title="Add New Member" method="post" action={api(resource)}>
     <div slot="bottom">
-        <a href={resource}>Back</a>
+        <a href={$url(resource)}>Back</a>
     </div>
 </Form>
