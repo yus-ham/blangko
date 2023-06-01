@@ -1,4 +1,5 @@
-const dataMember = require('./data.json')
+import dataMember from './data.json';
+
 
 const identity = {
     username: 'admin',
