@@ -98,13 +98,13 @@ const services = {
             }
 
             const refresh_token = btoa(String(Date.now()).split('').reverse().join())
-            this.res.setHeader('Set-Cookie', 'rt=' + refresh_token + '; HttpOnly')
+            this.res.setHeader('Set-Cookie', 'rt=' + refresh_token + '; Path=/api; HttpOnly')
 
             return { token: btoa(Date.now()), refresh_token, identity };
         },
 
         DELETE() {
-            this.res.setHeader('Set-Cookie', 'rt=; Max-Age=0; HttpOnly')
+            this.res.setHeader('Set-Cookie', 'rt=; Path=/api; Max-Age=0; HttpOnly')
         }
     }
 }
