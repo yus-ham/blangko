@@ -31,5 +31,5 @@ export default defineConfig({
         alias: {'~': `${__dirname}/src_front`}
     },
 
-    server: {...devServer, port: PORT||devServer.port},
+    server: dev && {...devServer, port: PORT||devServer.port},
 })
