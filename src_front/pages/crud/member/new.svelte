@@ -1,23 +1,19 @@
 <script>
-    import { goto } from "@roxi/routify";
+    import { goto, url } from "@roxi/routify";
     import { redirectData } from "~/utils/store";
     import Form from "./_form.svelte";
 
-    const resource = "/crud/member";
 
-    wretch.addEventListener("success", (e) => {
-        if (
-            e.detail.request.method === "POST" &&
-            e.detail.request.url.includes(resource)
-        ) {
-            $redirectData.model = e.detail.response.data;
-            $goto(`${resource}/[id]/edit`, {id:e.detail.response.data.id});
-        }
-    });
+    const route = "/crud/member";
+
+    function onSuccess({detail: model}) {
+        $redirectData.model = model;
+        $goto(`${route}/[id]/edit`, {id: model.id})
+    }
 </script>
 
-<Form title="Add New Member" method="post" action={api(resource)}>
+<Form title="Add New Member" action={api(route)} on:success={onSuccess}>
     <div slot="bottom">
-        <a href={resource}>Back</a>
+        <a href={$url(route)}>Back</a>
     </div>
 </Form>

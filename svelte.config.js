@@ -25,6 +25,7 @@ export default {
 
                 ['$_GLOBAL_BASE_URL', String(globalThis.BASE_URL||'').replace(/\/+$/, '')],
                 ['$_GLOBAL_API_URL', globalThis.API_URL],
+                ['$_GLOBAL_SESS_API_URL', globalThis.SESS_API_URL],
             ]
         }),
     ],
