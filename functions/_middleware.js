@@ -1,10 +1,6 @@
 import { serveResource } from './app.js';
 
 
-console.info({
-    env2: process.env
-})
-
 export async function onRequest({ request, next }) {
     const _parsedUrl = new URL(request.url)
 

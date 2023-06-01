@@ -10,6 +10,8 @@ const globals = {API_URL: '/api', BASE_URL: ''};
 const dev = NODE_ENV !== 'production';
 
 for (let ENV_VAR in globals) {
+    globalThis[ENV_VAR] = globals[ENV_VAR]
+
     if (process.env[ENV_VAR]) {
         globalThis[ENV_VAR] = process.env[ENV_VAR];
     }
@@ -17,9 +19,6 @@ for (let ENV_VAR in globals) {
 
 globalThis.SESS_API_URL || (globalThis.SESS_API_URL = (dev ? '/api' : globalThis.API_URL) + '/auth/session')
 
-console.info({
-    env: process.env
-})
 
 export default defineConfig({
     base: globalThis.BASE_URL||'/',
