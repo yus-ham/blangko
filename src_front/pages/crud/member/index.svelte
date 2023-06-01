@@ -22,6 +22,16 @@
             <th>...</th>
         </tr>
 
+        <tbody slot="filters">
+            <tr>
+                <td></td>
+                <td><input name="name"></td>
+                <td><input name="email"></td>
+                <td><input name="phone"></td>
+                <td></td>
+            </tr>
+        </tbody>
+
         <tr slot="data-row" let:row>
             <td>{row._num}</td>
             <td>{row.name}</td>
