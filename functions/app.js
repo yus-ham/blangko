@@ -110,8 +110,7 @@ const services = {
 }
 
 
-module.exports.serveResource = serveResource;
-async function serveResource(req, res, next) {
+export async function serveResource(req, res, next) {
     let [_, route, _id] = req._parsedUrl.pathname.match(/^\/api(\/.+?)(\/\d*)?$/)
 
     if (!services[route]) {
