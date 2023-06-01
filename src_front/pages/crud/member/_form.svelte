@@ -1,13 +1,15 @@
 <script>
-    import { onMount } from "svelte";
+    import { createEventDispatcher, onMount } from "svelte";
     import createForm from "~/utils/form.js";
 
     export let method, action;
 
     const formId = "form";
+
+    const dispatch = createEventDispatcher()
+
     const { submitting, initialize } = createForm(formId, {
-        method,
-        action,
+        method, action,
         success(model) {
             dispatch('success', model)
             alert(`Data saved`)
@@ -16,6 +18,7 @@
 
     onMount(_ => {
         initialize($$props.model)
+        dispatch('init', $$props.model)
     })
 </script>
 
