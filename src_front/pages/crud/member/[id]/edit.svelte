@@ -5,18 +5,18 @@
     import NotFounPage from '~/pages/_fallback.svelte';
 
 
-    let resource = '/crud/member';
+    let route = '/crud/member';
 
     const getModel = () => $redirectData.model
                ? {data: $redirectData.model}
-               : api.fetch(`${resource}/${$params.id}`)
+               : api.fetch(`${route}/${$params.id}`)
 </script>
 
 
 {#await getModel()}Loading...{#then respon}
-    <Form title="Update Member" model="{respon.data}" method="patch" action="{api(`${resource}/${$params.id}`)}">
+    <Form title="Update Member" model="{respon.data}" method="patch" action="{api(`${route}/${$params.id}`)}">
         <div slot="bottom">
-            <a href="{$url(resource)}">List</a> | <a href="{$url(resource)}/new">Add New</a>
+            <a href="{$url(route)}">List</a> | <a href="{$url(route)}/new">Add New</a>
         </div>
     </Form>
 {#catch err}
