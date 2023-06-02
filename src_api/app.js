@@ -7,6 +7,7 @@ const identity = {
     role: 'Administrator',
 }
 
+const token_duration = 10 * 60; //secs
 
 const services = {
     '/crud/member': {
@@ -90,7 +91,7 @@ const services = {
                 throw error(401)
             }
 
-            return { token: btoa(Date.now()), identity }
+            return { token: btoa(Date.now()), identity, duration: token_duration }
         },
 
         POST() {
@@ -101,7 +102,7 @@ const services = {
             const refresh_token = btoa(String(Date.now()).split('').reverse().join())
             this.res.setHeader('Set-Cookie', 'rt=' + refresh_token + '; HttpOnly')
 
-            return { token: btoa(Date.now()), refresh_token, identity };
+            return { token: btoa(Date.now()), refresh_token, identity, duration: token_duration }
         },
 
         DELETE() {
