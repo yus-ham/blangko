@@ -6,7 +6,8 @@ import User from './user.js';
 
 
 const config = {
-    jwt_key: process.env.JWT_KEY
+    jwt_key: process.env.JWT_KEY,
+    token_duration: 10 * 60, // secs
 }
 
 export default {
@@ -21,7 +22,8 @@ export default {
         if (result[0]) {
             return {
                 token: Buffer.from(config.jwt_key + Date.now()).toString('base64'),
-                identity: { username: result[0].username, role: result[0].role }
+                identity: { username: result[0].username, role: result[0].role },
+                duration: config.token_duration,
             }
         }
     },
@@ -48,6 +50,7 @@ export default {
                 identity,
                 token: Jwt.sign({ id: identity.id }, config.jwt_key),
                 refresh_token: rt.value,
+                duration: config.token_duration,
             }))
             .catch(err => common.invalidValueError(errors))
     }
