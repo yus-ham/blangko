@@ -18,6 +18,10 @@ const services = {
                 return data.find(x => x.id == id)
             }
 
+            ['name','email','phone'].forEach(key => {
+                this.params[key] && (data = data.filter(x => x[key].toLowerCase().includes(this.params[key].toLowerCase())))
+            })
+
             const perPage = 5;
             const totalPages = Math.ceil(dataMember.length / perPage)
             if (!this.params.page || this.params.page < 2) {
