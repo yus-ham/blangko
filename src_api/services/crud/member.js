@@ -15,7 +15,7 @@ export default {
         }
 
         const paging = common.createPager({req, res}, total)
-        return Model.findAll(paging.limit, paging.offset)
+        return Model.findAll(paging.limit, paging.offset, [...req.params.entries()].filter(([key]) => ['name','email','phone'].includes(key)))
     },
 
     async onRequestPost(req) {

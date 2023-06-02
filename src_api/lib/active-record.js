@@ -10,14 +10,30 @@ export default function (_ = {}) {
             return common.db().query(`select * from ${_.table} where ${_.pk} = ? limit 1`, [id]).then(r => r[0])
         },
 
-        findAll(limit = ``, offset) {
+        findAll(limit = ``, offset, filter = null) {
             if (limit !== ``) {
                 limit = `limit ${limit}`;
                 if (offset) {
                     limit += ` offset ${offset}`;
                 }
             }
-            return common.db().query(`select * from ${_.table} ${limit}`)
+
+            let where = '';
+            if (filter) {
+                if (typeof filter[Symbol.iterator] === 'function') {
+                    for (let [column, value] of filter) {
+                        where += ` and ${column} like '%${ value }%'`;
+                    }
+                }
+                else {
+                    for (let column in filter) {
+                        where += ` and ${column} like '%${ filter[column] }%'`;
+                    }
+                }
+                where && (where = `where `+ where.slice(5))
+            }
+
+            return common.db().query(`select * from ${_.table} ${where} ${limit}`)
         },
 
         findTotalCount() {
