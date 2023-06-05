@@ -9,15 +9,19 @@ function instance(id, opts) {
 }
 
 function Processor(id, opts = {}) {
-    opts.errorsMap = opts.errorsMap || {}
-    opts.errorClass = opts.errorClass || window.formErrorClass || []
-    opts.successClass = opts.successClass || window.formSuccessClass || '';
+    opts.feedback = opts.feedback || {}
+    opts.feedback.classes || (opts.feedback.classes = {valid:[], error:[]})
+
+    Object.entries(window.formFeedbackClasses||{}).forEach(([type, cls]) => {
+        opts.feedback.classes[type].push(...cls)
+    })
 
     this.submitting = writable(false)
 
     this.initialize = function(model) {
         const form = elem('#' + id)
-        listen(form, 'submit', submitHandler)
+        listen(form, 'submit', onSubmit)
+        listen(form, 'change', inputChanged)
         opts.action || (opts.action = form.action)
         if (typeof model === 'object' && model !== null)
             setInitialValue(form, model)
@@ -37,57 +41,6 @@ function Processor(id, opts = {}) {
     req.post = _ => req.then(reqWithBody)
     req.patch = req.post
 
-    function submitHandler(ev) {
-        ev.preventDefault()
-
-        const _self = instances[opts.key]
-        const form = ev.target;
-        const method = opts.method || form.getAttribute('method') || 'post';
-        const request = { url: opts.action, method: method.toUpperCase() }
-
-        _self.submitting.set(true)
-        clearErrorOnChanges(form)
-
-        req[method]().then(_req => {
-            _req[method]()
-                .error(422, err => parseErrors(form, err))
-                .res(response => {
-                    response.json().then(data => successResponseCallback(data, request, response))
-                })
-                .finally(_ => _self.submitting.set(false))
-        })
-    }
-
-    async function successResponseCallback(data, request, response) {
-        response.data = data;
-        opts.success && (await opts.success(data))
-        wretch.dispatchEvent('success', { request, response })
-    }
-
-    function parseErrors(form, err) {
-        const errors = JSON.parse(err.text)
-        Object.entries(errors).forEach(item => {
-            showFeedback(item, form)
-        })
-    }
-
-    function showFeedback([field, msg], form) {
-        let input, hint;
-
-        if (opts.errorsMap[field]) {
-            hint = elem(opts.errorsMap[field][0])
-            input = elem(opts.errorsMap[field][1])
-        } else {
-            input = form[field]
-            hint = input.nextElementSibling;
-        }
-        if (hint) {
-            opts.errorClass[0] && hint.classList.add(opts.errorClass[0])
-            hint.innerHTML = msg;
-        }
-        input && opts.errorClass[1] && input.classList.add(opts.errorClass[1])
-    }
-
     function setInitialValue(form, model) {
         for (let input of form.elements) {
             if (input.value === undefined)
@@ -98,21 +51,78 @@ function Processor(id, opts = {}) {
         }
     }
 
-    function clearErrorOnChanges(form) {
-        for (let input of form.elements) {
-            listen(input, 'change', (_input, _hint) => {
-                if (opts.errorsMap[input.name]) {
-                    _input = elem(opts.errorsMap[input.name][1])
-                    _hint = elem(opts.errorsMap[input.name][0])
-                }
-                else {
-                    _input = input;
-                    _hint = input.nextElementSibling;
-                }
-                _input && _input.classList.remove(opts.errorClass[1])
-                _hint && (_hint.innerHTML = '')
-            });
+    function onSubmit(ev) {
+        ev.preventDefault()
+
+        const _self = instances[opts.key]
+        const form = ev.target;
+        const method = opts.method || form.getAttribute('method') || 'post';
+
+        _self.submitting.set(true)
+
+        req[method]().then(_req => {
+            _req[method]()
+                .error(422, err => parseErrors(form, err))
+                .res(response => response.json().then(data => onSuccess(data)))
+                .finally(_ => _self.submitting.set(false))
+        })
+    }
+
+    function onSuccess(data) {
+        opts.success && opts.success(data)
+    }
+
+    function parseErrors(form, err) {
+        const errors = JSON.parse(err.text)
+        Object.entries(errors).forEach(item => showErrors(item, form))
+    }
+
+    function showErrors([field, msg], form) {
+        let errClass, input = form[field]
+        let hint = input.nextElementSibling;
+        let feedback = opts.feedback;
+
+        if (feedback.elem && Array.isArray(feedback.elem[field])) {
+            hint = elem(feedback.elem[field][0])
+            input = elem(feedback.elem[field][1]) || input
         }
+
+        Array.isArray(feedback.classes?.error) && (errClass = feedback.classes.error[0])
+
+        if (hint && errClass) {
+            hint.classList.add(errClass)
+            hint.innerHTML = msg;
+            errClass = feedback.classes.error[1]
+        }
+
+        input && errClass && input.classList.add(errClass)
+    }
+
+    function inputChanged(e) {
+        if (!['INPUT','SELECT','TEXTAREA'].includes(e.target.nodeName)) return
+        if (['checkbox','radio'].includes(e.target.type)) return
+
+        let input = e.target, hint = e.target.nextElementSibling;
+        let classes = opts.feedback?.classes ||{}
+
+        if (!classes) return;
+
+        if (opts.feedback?.elem && Array.isArray(opts.feedback.elem[e.target.name])) {
+            input = elem(opts.feedback.elem[e.target.name][1])
+            hint = elem(opts.feedback.elem[e.target.name][0])
+        }
+
+        let validClass, errClass;
+
+        Array.isArray(classes.valid) && (validClass = classes.valid[0])
+        Array.isArray(classes.error) && (errClass = classes.error[0])
+
+        if (hint && validClass) {
+            hint.classList.remove(errClass) || (hint.innerHTML = '') || (errClass = classes.error[1])
+            hint.classList.add(validClass) || (validClass = classes.valid[1])
+        }
+
+        validClass && input.classList.remove(errClass) || input.classList.add(validClass)
     }
 }
 
