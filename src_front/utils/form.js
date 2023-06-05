@@ -57,22 +57,19 @@ function Processor(id, opts = {}) {
         const _self = instances[opts.key]
         const form = ev.target;
         const method = opts.method || form.getAttribute('method') || 'post';
-        const request = { url: opts.action, method: method.toUpperCase() }
 
         _self.submitting.set(true)
 
         req[method]().then(_req => {
             _req[method]()
                 .error(422, err => parseErrors(form, err))
-                .res(response => response.json().then(data => onSuccess(data, request, response)))
+                .res(response => response.json().then(data => onSuccess(data)))
                 .finally(_ => _self.submitting.set(false))
         })
     }
 
-    async function onSuccess(data, request, response) {
-        response.data = data;
+    function onSuccess(data) {
         opts.success && opts.success(data)
-        wretch.dispatchEvent('success', { request, response })
     }
 
     function parseErrors(form, err) {
