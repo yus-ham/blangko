@@ -9,8 +9,11 @@
     const { initialize, submitting } = createForm(formId, {
         action: SESS_API_URL,
         credentials: 'omit',
-        errorClass: ['text-danger'],
-        errorsMap: {password: ['.hint']},
+
+        feedback: {
+            classes: {error: ['text-danger']},
+            elem: {password: ['.hint']},
+        },
 
         success(data) {
             data.expired_at = Date.now() + (data.duration * 1000)
