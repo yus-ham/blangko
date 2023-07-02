@@ -1,3 +1,6 @@
 {
-  "routes": [{ "src": "/[^.]+", "dest": "/dist/client/", "status": 200 }]
+  "routes": [
+    { "src": "/api/:path((?!entry).*)", "dest": "/api/entry" },
+    { "src": "/[^.]+", "dest": "/dist/client/", "status": 200 }
+  ]
 }
