@@ -4,7 +4,7 @@ export const config = {
 };
 
 
-import { serveResource } from '../src-api/app.js';
+import { serveResource } from '../src_api/app.js';
 const next = () => void 0;
 
 export default async function(request) {
