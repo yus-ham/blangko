@@ -1,4 +1,6 @@
 import dataMember from './data.json' assert {type: 'json'}
+import sendStream from 'send';
+import getRawBody from 'raw-body';
 
 
 const identity = {
@@ -155,7 +157,6 @@ export async function serveResource(req, res, next) {
 }
 
 
-import sendStream from 'send';
 
 function serveStatic(req, res, opts = {}) {
     if (req.method !== 'GET' && req.method !== 'HEAD') {
@@ -197,7 +198,6 @@ const parsers = {
 }
 
 
-import getRawBody from 'raw-body';
 async function parseBody(ctx) {
     if (!['POST', 'PATCH'].includes(ctx.req.method)) {
         return;
