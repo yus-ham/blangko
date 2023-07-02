@@ -8,7 +8,7 @@ export const config = {
 
 const next = () => void 0;
 
-export default async function(request) {
+export default async function middleware(request) {
     const _parsedUrl = new URL(request.url)
 
     if (_parsedUrl.pathname.slice(0, 5) !== '/api/') {
