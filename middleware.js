@@ -3,6 +3,7 @@ import { serveResource } from './src_api/app.js';
 export const config = {
   // runtime: 'edge', // this is a pre-requisite
   // regions: ['sin1'], // only execute this function on iad1
+  //
 };
 
 
