@@ -1,4 +1,7 @@
 {
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "installCommand": "curl -fsSL https://bun.sh/install | bash && ~/.bun/bin/bun install --frozen-lockfile",
+  "buildCommand": "~/.bun/bin/bun run build",
   "routes": [
     { "src": "/api/:path((?!entry).*)", "dest": "/api/entry" },
     { "src": "/[^.]+", "dest": "/dist/client/", "status": 200 }
