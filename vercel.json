@@ -1,7 +1,4 @@
 {
-  "$schema": "https://openapi.vercel.sh/vercel.json",
-  "installCommand": "if test ! -f $HOME/.bun/bin/bun; then curl -fsSL https://bun.sh/install | bash; fi && $HOME/.bun/bin/bun install",
-  "buildCommand": "cp config.js-example config.js && $HOME/.bun/bin/bun run build",
   "routes": [
     { "src": "/api/:path((?!entry).*)", "dest": "/api/entry" },
     { "src": "/[^.]+", "dest": "/dist/client/", "status": 200 }
