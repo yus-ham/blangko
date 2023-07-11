@@ -1,4 +1,4 @@
-import dataMember from './data.json' assert {type: 'json'}
+import dataMember from './data.json';
 // import sendStream from 'send';
 // import getRawBody from 'raw-body';
 
