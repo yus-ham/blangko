@@ -6,8 +6,8 @@ import wretch from './wretch.esm.js';
 
 
 export const urlRewrite = {
-    toExternal: u => u.startsWith('/') ? BASE_URL + u : location.pathname + '/../' + u,
-    toInternal: u => u === BASE_URL ? '/' : u.substr(BASE_URL.length),
+    toExternal: u => u ? (u.startsWith('/') ? BASE_URL + u : location.pathname + '/../' + u) : '/',
+    toInternal: u => u === BASE_URL ? '/' : u.slice(BASE_URL.length),
 }
 
 function parseHeaders(res) {
