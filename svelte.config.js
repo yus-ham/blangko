@@ -28,6 +28,24 @@ export default {
                 ['$_GLOBAL_SESS_API_URL', globalThis.SESS_API_URL],
             ]
         }),
+
+        (function() {
+            const components = {
+                GridView: ['api-url'],
+                CheckboxColumn: ['row-count'],
+            }
+
+            return {
+                markup: ({content: code}) => {
+                    Object.entries(components).forEach(([component, props]) => {
+                        props.forEach(prop => {
+                            code = code.replace(new RegExp('(<'+ component +' (.+?))'+ prop +'=', 'g'), '$1'+ prop.replace(/-(\w)/g, m => m[1].toUpperCase()) +'=')
+                        })
+                    })
+                    return {code}
+                }
+            }
+        })(),
     ],
 
     onwarn(warn, next) {

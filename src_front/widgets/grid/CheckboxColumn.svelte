@@ -12,7 +12,7 @@
     }
 </script>
 
-{#if $$props['row-count']}
+{#if $$props.rowCount}
     <input bind:this={cb_input} class={className} type="checkbox" on:change={toggleSelections} checked={isAllChecked()} />
 {#else}
     <input class={className} type="checkbox" value={$$props.value} />

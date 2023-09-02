@@ -3,16 +3,16 @@
     import { DarkPaginationNav as PagerNav } from 'svelte-paginate';
 
 
-    let table, spinner, columnLen, data = [];
+    let table, spinner, columnLen, data = []
 
     export const collections = {}
 
-    const list = api.list($$props['api-url'])
+    const list = api.list($$props.apiUrl)
 
     list.subscribe(respon => {
         if (!respon.loading) {
-            if ($$props['collection']) {
-                data = respon.data[ $$props['collection'] ]
+            if ($$props.collection) {
+                data = respon.data[$$props.collection]
 
                 for (const prop in respon.data) {
                     collections[prop] = respon.data[prop]                    
@@ -53,7 +53,7 @@
                     confirm = window.confirm(btnDel.dataset.confirm)
                 }
 
-                confirm && wretchAuth(api($$props['api-url']) +'/'+ btnDel.dataset.id)
+                confirm && wretchAuth(api($$props.apiUrl) +'/'+ btnDel.dataset.id)
                                 .then(req => req.delete().res(_ => $list.load()))
             }
         })
