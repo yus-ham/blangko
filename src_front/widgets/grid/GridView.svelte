@@ -85,13 +85,13 @@
         </table>
     </figure>
 
-    {#if $list.paging?.offset}
-    <div>
-        <p><i>Showing <span>{$list.paging.offset}</span> to <span>{$list.paging.to}</span> of <span>{$list.paging.totalData}</span></i></p>
-    </div>
-    <div>
-        <PagerNav on:setPage={e => $list.load(e.detail.page)} totalItems={$list.paging.totalData} pageSize={$list.paging.perPage} currentPage={$list.paging.page} showStepOptions="1" />
-    </div>
+    {#if $list.paging.totalPages > 1}
+        <div>
+            <p><i>Showing <span>{$list.paging.offset}</span> to <span>{$list.paging.to}</span> of <span>{$list.paging.totalData}</span></i></p>
+        </div>
+        <div>
+            <PagerNav on:setPage={e => $list.load(e.detail.page)} totalItems={$list.paging.totalData} pageSize={$list.paging.perPage} currentPage={$list.paging.page} showStepOptions />
+        </div>
     {#endif}
 
     {#if $list.loading}<div bind:this={spinner} aria-busy="true"></div>{#endif}

@@ -19,10 +19,11 @@ function parseHeaders(res) {
 function setPaging(res, page = 1) {
     const perPage = +res.headers.get('X-Pagination-Per-Page')
     const totalData = +res.headers.get('X-Pagination-Total-Count')
+    const totalPages = perPage > 0 ? totalData / perPage : 1;
     const offset = (page - 1) * perPage + 1;
     const to = Math.min(totalData, offset + perPage - 1)
 
-    res.paging = { page, perPage, totalData, offset, to }
+    res.paging = { page, perPage, totalData, totalPages, offset, to }
 }
 
 function http(m, w) {
@@ -92,11 +93,13 @@ api.list = function(url) {
 
     function load(page, qp = '') {
         respon.set({ ...$(respon), loading: true })
-        if (!page) page = this.paging.page;
-        const _url = url + (`${url}`.includes('?') ? '&' : '?') + 'page=' + page +'&'+ qp;
-        api.fetch(_url).then(res => {
-            setPaging(res, page)
-            setRespon(res)
+        setTimeout(_ => {
+            if (!page) page = this.paging.page;
+            const _url = url + (`${url}`.includes('?') ? '&' : '?') + 'page=' + page +'&'+ qp;
+            api.fetch(_url).then(res => {
+                setPaging(res, page)
+                setRespon(res)
+            })
         })
     }
 
