@@ -41,6 +41,7 @@ class InstallController extends Controller
         $this->setRandomKey($common, 'jwtKey');
         $this->setRandomKey($web, 'cookieValidationKey');
 
+        FileHelper::createDirectory("$dir/env");
         Console::output(" Saving configs...");
         file_put_contents("$dir/env/common.php", $common);
         file_put_contents("$dir/env/web.php", $web);
