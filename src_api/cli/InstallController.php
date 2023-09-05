@@ -30,8 +30,8 @@ class InstallController extends Controller
         Console::output(" > Select environment\n 1 - Development\n 2 - Production");
         $env = Console::prompt(' Your answer:', ['required' => 1, 'validator' => fn ($i) => in_array($i, [1,2])]);
 
-        $common = file_get_contents("$dir/env-example/common.php");
-        $web = file_get_contents("$dir/env-example/web.php");
+        $common = file_get_contents("$dir/env-sample/common.php");
+        $web = file_get_contents("$dir/env-sample/web.php");
 
         if ($env == '2') {
             $common = preg_replace("/defined\(/", "// defined(", $common);
