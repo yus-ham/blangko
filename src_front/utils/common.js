@@ -6,7 +6,7 @@ import wretch from './wretch.esm.js';
 
 
 export const urlRewrite = {
-    toExternal: u => u ? (u.startsWith('/') ? BASE_URL + u : location.pathname + '/../' + u) : '/',
+    toExternal: u => u ? (u.startsWith('/') ? BASE_URL + u : location.pathname + '/../' + u) : BASE_URL + '/',
     toInternal: u => u === BASE_URL ? '/' : u.slice(BASE_URL.length),
 }
 
