@@ -6,8 +6,8 @@ import wretch from './wretch.esm.js';
 
 
 export const urlRewrite = {
-    toExternal: u => u.startsWith('/') ? BASE_URL + u : location.pathname + '/../' + u,
-    toInternal: u => u === BASE_URL ? '/' : u.substr(BASE_URL.length),
+    toExternal: u => u ? (u.startsWith('/') ? BASE_URL + u : location.pathname + '/../' + u) : BASE_URL + '/',
+    toInternal: u => u === BASE_URL ? '/' : u.slice(BASE_URL.length),
 }
 
 function parseHeaders(res) {
@@ -19,50 +19,68 @@ function parseHeaders(res) {
 function setPaging(res, page = 1) {
     const perPage = +res.headers.get('X-Pagination-Per-Page')
     const totalData = +res.headers.get('X-Pagination-Total-Count')
+    const totalPages = perPage > 0 ? totalData / perPage : 1;
     const offset = (page - 1) * perPage + 1;
     const to = Math.min(totalData, offset + perPage - 1)
 
-    res.paging = { page, perPage, totalData, offset, to }
+    res.paging = { page, perPage, totalData, totalPages, offset, to }
 }
 
-JSON.fetch = function(req, d = {}) {
-    d = { data: d }
-    const resolver = _req => _req
+function http(m, w) {
+    const resolver = _w => _w
         .unauthorized(err => err)
         .res(async _res => {
             if (!_res) {
                 return openAuthForm()
             }
-            _res.data = await _res.json();
-            parseHeaders(_res);
+            _res.data = await _res.json()
+            parseHeaders(_res)
             return _res;
         })
 
-    return Promise.resolve(req).then(_req => _req.resolve(resolver).get())
+        return w.then
+            ? w.then(_w => _w.resolve(resolver)[m]())
+            : w.resolve(resolver)[m]()
 }
 
 export async function getSession() {
     const sess = $(session)
-    
+
     if (sess && Date.now() < $(session).expired_at)
         return sess;
 
-    const res = await JSON.fetch(wretch(SESS_API_URL))
+    const res = await http('get', wretch(SESS_API_URL))
 
-    if (res.data) {
-        res.data.expired_at = Date.now() + (res.data.duration * 1000)
-        session.set(res.data)
-        return res.data
-    }
+    if (!res.data)
+        return res;
 
-    return res;
+    res.data.expired_at = Date.now() + (res.data.duration * 1000)
+    session.set(res.data)
+    return res.data;
 }
 
 const wretchAuth = u => getSession().then(sess => wretch(u).auth(`Bearer ${sess.token}`))
 
 const api = u => API_URL + '/' + (u ? String(u).replace(/^\/+/, '') : '')
-api.fetch = (u, d) => JSON.fetch(wretchAuth(api(u)), d)
-api.data = (u, d) => api.fetch(u, d).then(res => res.data)
+api.fetch = (u) => http('get', wretchAuth(api(u)))
+api.get = (u) => api.fetch(u).then(res => res.data)
+
+api.patch = async function(u, data) {
+    try {
+        const qs = new URLSearchParams(data).toString()
+        const _wretch = await wretchAuth(api(u)).formUrl(qs)
+        const {data} = await http('patch', _wretch)
+        return data;
+    } catch (err) {
+        try {
+            err.messages = JSON.parse(err.text)
+        } catch(e) {
+            err.messages = []
+        }
+
+        throw err;
+    }
+}
 
 api.list = function(url) {
     const respon = writable({
@@ -75,11 +93,13 @@ api.list = function(url) {
 
     function load(page, qp = '') {
         respon.set({ ...$(respon), loading: true })
-        if (!page) page = this.paging.page;
-        const _url = url + (`${url}`.includes('?') ? '&' : '?') + 'page=' + page +'&'+ qp;
-        api.fetch(_url).then(res => {
-            setPaging(res, page)
-            setRespon(res)
+        setTimeout(_ => {
+            if (!page) page = this.paging.page;
+            const _url = url + (`${url}`.includes('?') ? '&' : '?') + 'page=' + page +'&'+ qp;
+            api.fetch(_url).then(res => {
+                setPaging(res, page)
+                setRespon(res)
+            })
         })
     }
 
@@ -103,11 +123,10 @@ export function openAuthForm() {
     return $(goto)(signInUrl) || '';
 }
 
-export function logout() {
-    return wretch(SESS_API_URL).delete().res(_ => {
-        redirectData.set({ prevUrl: undefined })
-        session.set(undefined)
-    })
+export async function logout() {
+    await wretch(SESS_API_URL).delete()
+    redirectData.set({ prevUrl: undefined })
+    session.set(undefined)
 }
 
 

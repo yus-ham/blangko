@@ -3,16 +3,16 @@
     import { DarkPaginationNav as PagerNav } from 'svelte-paginate';
 
 
-    let table, spinner, columnLen, data = [];
+    let table, spinner, columnLen, data = []
 
     export const collections = {}
 
-    const list = api.list($$props['api-url'])
+    const list = api.list($$props.apiUrl)
 
     list.subscribe(respon => {
         if (!respon.loading) {
-            if ($$props['collection']) {
-                data = respon.data[ $$props['collection'] ]
+            if ($$props.collection) {
+                data = respon.data[$$props.collection]
 
                 for (const prop in respon.data) {
                     collections[prop] = respon.data[prop]                    
@@ -53,7 +53,7 @@
                     confirm = window.confirm(btnDel.dataset.confirm)
                 }
 
-                confirm && wretchAuth(api($$props['api-url']) +'/'+ btnDel.dataset.id)
+                confirm && wretchAuth(api($$props.apiUrl) +'/'+ btnDel.dataset.id)
                                 .then(req => req.delete().res(_ => $list.load()))
             }
         })
@@ -85,13 +85,13 @@
         </table>
     </figure>
 
-    {#if $list.paging?.offset}
-    <div>
-        <p><i>Showing <span>{$list.paging.offset}</span> to <span>{$list.paging.to}</span> of <span>{$list.paging.totalData}</span></i></p>
-    </div>
-    <div>
-        <PagerNav on:setPage={e => $list.load(e.detail.page)} totalItems={$list.paging.totalData} pageSize={$list.paging.perPage} currentPage={$list.paging.page} showStepOptions="1" />
-    </div>
+    {#if $list.paging.totalPages > 1}
+        <div>
+            <p><i>Showing <span>{$list.paging.offset}</span> to <span>{$list.paging.to}</span> of <span>{$list.paging.totalData}</span></i></p>
+        </div>
+        <div>
+            <PagerNav on:setPage={e => $list.load(e.detail.page)} totalItems={$list.paging.totalData} pageSize={$list.paging.perPage} currentPage={$list.paging.page} showStepOptions />
+        </div>
     {#endif}
 
     {#if $list.loading}<div bind:this={spinner} aria-busy="true"></div>{#endif}
